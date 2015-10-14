@@ -1,0 +1,242 @@
+package henrik;
+
+
+import javacard.framework.APDU;
+import javacard.framework.Applet;
+import javacard.framework.ISO7816;
+import javacard.framework.ISOException;
+import javacard.framework.JCSystem;
+import javacard.framework.OwnerPIN;
+import javacard.framework.PIN;
+import javacard.framework.Util;
+import javacard.security.CryptoException;
+import javacard.security.KeyBuilder;
+import javacard.security.KeyPair;
+import javacard.security.PublicKey;
+import javacard.security.RSAPrivateKey;
+import javacard.security.RSAPublicKey;
+import javacard.security.Signature;
+
+/**
+ * @author shane
+ * 
+ */
+public class cardTest extends Applet {
+	//Try to allocate all variable here and do not create new ones 
+	//The Public/Private key pair that this card will use
+	private KeyPair keys = new KeyPair(KeyPair.ALG_RSA, KeyBuilder.LENGTH_RSA_512);
+	//Signature object to sign with card private key
+	private Signature sig;
+	//Card Public key
+	private RSAPublicKey k;
+    //Card Private key
+	private RSAPrivateKey k2;
+    //TODO Local Certificate database for verification. Limit to xx certificates
+	//private Certificate[]=new byte[10];
+	
+	//byte[] testSig = new byte[256];
+	byte[] test = { 0x01, 0x02, 0x04, 0x05, 0x06, 0x07 };
+    //	To store data to be sent beck to host application
+	byte[] output = new byte[256];
+	//for temporary storing data before copying into output
+	byte[] buff2 = new byte[2];
+	//For bigger data
+	byte[] bigArray;  
+	//To store the size of the output buffer
+	short size;
+	//Length of signature or other short values
+	short len;
+	//Size of modulus and signature
+	final short keysize=64;
+	//PIN
+	private OwnerPIN pin;
+	//max_length of pin
+	private final byte MAX_LENGTH=(byte) 0x04;
+	//Max number of attempts
+	private final byte MAX_ATTEMPTS=(byte) 0x05;
+	
+	//Predefined Commands
+	private final byte CLA=(byte) 0x80;
+	private final byte SEND_TEST_SIGNATURE=(byte) 0x00;
+	private final byte SEND_PUB_MOD=(byte) 0x01;
+	private final byte SEND_PUB_EXP=(byte) 0x02;
+	private final byte SEND_PRV_EXP=(byte) 0x03;
+	private final byte SEND_KEY_LENGTH=(byte) 0x04;
+	private final byte SIGN_INPUT_DATA=(byte) 0x05;
+	private final byte SEND_AUTHENTICATED_PUB_EXP=(byte) 0x06;
+	
+	//Predefined return codes to use when throwing custom exceptions
+	
+
+	private cardTest() {
+		
+		//Instantiate all object the applet will ever need
+		//pin= new OwnerPIN(MAX_LENGTH, MAX_ATTEMPTS);
+		//if(bArray==null){//check 
+//			If no pin is passed as parameter at installation time use default 0000
+			//pin.update(new byte[] {0x00,0x00,0x00,0x00}, (short) 0, (byte) 0x04);
+		//	}
+		//else {
+			//pin.update(bArray, bOffset,  bLength);
+		//}
+		
+		try{
+			//Set signature algorithm
+			sig = Signature.getInstance(Signature.ALG_RSA_SHA_PKCS1, false);
+			//Generate the card keys
+			keys.genKeyPair();
+			//Get the public key
+			k = (RSAPublicKey) keys.getPublic();
+			//Get the private key
+			k2 = (RSAPrivateKey) keys.getPrivate();
+			//Initialize the signature object with card private key
+			sig.init(k2, Signature.MODE_SIGN);
+			}catch(CryptoException ex){
+			ISOException.throwIt((short)(ex.getReason()) );
+			}catch(SecurityException ex){
+			ISOException.throwIt((short)(0x6F10) );
+			}catch(Exception ex){
+			ISOException.throwIt((short)(0x6F20));
+			}
+		
+	}
+
+	public static void install(byte[] bArray, short bOffset, byte bLength) {
+		// GP-compliant JavaCard applet registration
+		
+		new cardTest().register();//bArray, (short) (bOffset + 1), bArray[bOffset]);<-This was the reason it was giving error at installation time when creating the keys in the contructor....
+	}
+
+	public void process(APDU apdu) {
+		// Good practice: Return 9000 on SELECT
+		if (selectingApplet()) {
+			return;
+		}
+		
+		byte[] buff = apdu.getBuffer();
+		//Get the incoming APDU
+		//Util.arrayCopy(apdu.getBuffer(),(short) 0, buff,(short) 0,(short) apdu.getBuffer().length);// apdu.getBuffer();
+		//Check the CLA 
+		
+		/*
+		if(buff[ISO7816.OFFSET_CLA]!=CLA){
+			ISOException.throwIt(ISO7816.SW_CLA_NOT_SUPPORTED);
+		}
+		*/
+		//Switch on the instruction code INS
+		switch (buff[ISO7816.OFFSET_INS]) {
+//		Create a test signature using test
+		case SEND_TEST_SIGNATURE: 	
+			//Sign the test byte and get the signature size
+			size = sig.sign(test, (short) 0, (short) test.length, output,
+					(short) 0);
+			break;
+//			return modulus of public key	
+		case SEND_PUB_MOD: 
+			//Retrieve the modulus, store it in the output byte array and set the output length
+			size = k.getModulus(output, (short) 0);
+		    break;
+//		  return exponent of public key  
+		case SEND_PUB_EXP:  
+//			Retrieve the public exponent, store it in the output byte array and set the output length
+			size = k.getExponent(output, (short) 0);
+			break;
+//			return exponent of private key given correct pin authentication 
+		case SEND_PRV_EXP: 
+			// Check that the user is authenticated (correct command 0x80 0x03 0x01 0x00 0x04 0x00 0x00 0x00 0x00 0x00)
+			if(buff[ISO7816.OFFSET_P1]==((byte) 0x01)){
+				if(buff[ISO7816.OFFSET_LC]!=(byte) 0x00){
+					if(pin.check(buff, (short) (ISO7816.OFFSET_LC+1), buff[ISO7816.OFFSET_LC])){
+						size = k2.getExponent(output, (short) 0);
+						pin.reset();
+					} else {
+						//wrong pin (system should have taken care of decrementing the counter and checking boundary conditions)
+						ISOException.throwIt(ISO7816.SW_WRONG_DATA);
+					}
+				} else {
+					ISOException.throwIt(ISO7816.SW_CONDITIONS_NOT_SATISFIED);//no pin was sent
+				}
+			} else {
+				ISOException.throwIt(ISO7816.SW_INCORRECT_P1P2); //wrong command code	
+			}
+//			Retrieve the private exponent, store it in the output byte array and set the output length
+			size = k2.getExponent(output, (short) 0);
+			break;
+//			return size of signature and modulus for testing purposes (they should be the same)
+		case (byte) SEND_KEY_LENGTH: 
+			shortToByteArray(keysize);
+		    size=(short) 2;
+		    Util.arrayCopy(buff, (short) 0, output, (short) 0, size);
+			break;
+//			Sign arbitrary text sent to card
+		case (byte) SIGN_INPUT_DATA: 
+			size=(short) buff[ISO7816.OFFSET_LC];
+		    size=sig.sign(buff,(short) (ISO7816.OFFSET_LC+1), size, output,
+					(short) 0);
+		    break;
+//			return the modulus of public keywith a random value sent from the host
+		case (byte) SEND_AUTHENTICATED_PUB_EXP: 
+			//Find the size of the random value
+			size=(short) buff[ISO7816.OFFSET_LC];
+		    //If the current key is 2048 bit =256 bytes we need a big array to store all data to sign
+		    //TODO limit the size of the input value and do some checks on it 
+		    bigArray=JCSystem.makeTransientByteArray((short) (size+keysize), JCSystem.CLEAR_ON_RESET);
+		    //Update the signature object with that value
+		    Util.arrayCopy(buff, (short) (ISO7816.OFFSET_LC+1), bigArray, (short) 0, size);
+		    k.getModulus(bigArray, (short) (size));
+		    //Util.arrayCopy(buff, (short) 0, bigArray, (short) (ISO7816.OFFSET_LC+size+1), len);
+		    size = sig.sign(bigArray,(short) 0,(short) bigArray.length,output, (short) 0);
+		    break;
+		    
+		case (byte) 0x07:
+			size=(short) 2;
+			output[0]=(byte) 0x09;
+			output[1]=(byte) 0x08;
+			break;
+		case (byte) 0x08:
+			short length = 4;
+			//short length = (short) buff.length;
+			size=(short) length;
+			output[0]=(byte) 0x08;
+			output[1]=(byte) 0x08;
+			
+			for(short i = 0; i < length; i++){
+				output[i] = (byte) 0x03;
+			}
+			break;
+		default:
+			// good practice: If you don't know the INStruction, say so:
+			ISOException.throwIt(ISO7816.SW_INS_NOT_SUPPORTED);
+		}
+		
+		send(apdu);
+	}
+
+	
+	//Converts two adjacent bytes in a given array to a short 
+	/*private static short readShort(byte[] data, short offset) {
+		return (short) (((data[offset] << 8)) | ((data[offset + 1] & 0xff)));
+	}*/
+	
+	//Convert a short value to a byte array and writes the result in the first two elements of buff
+	private void shortToByteArray(short s) {
+
+		buff2[0]=(byte) ((s & (short) 0xFF00) >> 8);
+		buff2[1]=(byte) (s & (short) 0x00FF);
+		return;
+	}
+
+	//Common method that sets the size of the output to the global variable size and sends the content of the global variable output 
+	private void send(APDU apdu) {
+		apdu.setOutgoing();
+		apdu.setOutgoingLength(size);
+		apdu.sendBytesLong(output, (short) 0, size);
+	}
+	
+	//Simpler send method that assumes that APDU.buffer is updated with the output and sent instead. Saves resources, but needs some checks on the 
+	//size of the incoming buffer
+	private void sendBuff(APDU apdu) {
+		apdu.setOutgoingAndSend((short) 0,size);
+	}
+    
+}
