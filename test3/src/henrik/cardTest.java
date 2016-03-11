@@ -24,10 +24,6 @@ import javacard.security.*;
 
 import java.lang.*;
 
-/**
- * @author shane
- * 
- */
 public class cardTest extends Applet implements ExtendedLength{
 	//Try to allocate all variable here and do not create new ones 
 	//The Public/Private key pair that this card will use
