@@ -12,19 +12,26 @@ import javacard.framework.Util;
 import javacard.security.CryptoException;
 import javacard.security.KeyBuilder;
 import javacard.security.KeyPair;
+import javacard.security.MessageDigest;
 import javacard.security.PublicKey;
 import javacard.security.RSAPrivateKey;
 import javacard.security.RSAPublicKey;
 import javacard.security.Signature;
+import javacard.security.AESKey;
+import javacardx.apdu.ExtendedLength;
+import javacardx.crypto.*;
+import javacard.security.*;
+
+import java.lang.*;
 
 /**
  * @author shane
  * 
  */
-public class cardTest extends Applet {
+public class cardTest extends Applet implements ExtendedLength{
 	//Try to allocate all variable here and do not create new ones 
 	//The Public/Private key pair that this card will use
-	private KeyPair keys = new KeyPair(KeyPair.ALG_RSA, KeyBuilder.LENGTH_RSA_512);
+	private KeyPair keys;
 	//Signature object to sign with card private key
 	private Signature sig;
 	//Card Public key
@@ -37,7 +44,7 @@ public class cardTest extends Applet {
 	//byte[] testSig = new byte[256];
 	byte[] test = { 0x01, 0x02, 0x04, 0x05, 0x06, 0x07 };
     //	To store data to be sent beck to host application
-	byte[] output = new byte[256];
+	byte[] output = new byte[32767];
 	//for temporary storing data before copying into output
 	byte[] buff2 = new byte[2];
 	//For bigger data
@@ -62,12 +69,35 @@ public class cardTest extends Applet {
 	private final byte SEND_PUB_EXP=(byte) 0x02;
 	private final byte SEND_PRV_EXP=(byte) 0x03;
 	private final byte SEND_KEY_LENGTH=(byte) 0x04;
-	private final byte SIGN_INPUT_DATA=(byte) 0x05;
-	private final byte SEND_AUTHENTICATED_PUB_EXP=(byte) 0x06;
+	//private final byte SIGN_INPUT_DATA=(byte) 0x05;
+	//private final byte SEND_AUTHENTICATED_PUB_EXP=(byte) 0x06;
 	
-	//Predefined return codes to use when throwing custom exceptions
+	//Cryptography
+	Cipher cipherRSA;
+	Cipher cipherAES;
+	byte[] cryptoBuffer;// = new byte[32767];
 	
-
+	AESKey aesKey;
+	RandomData randomData;
+	byte[] rnd;
+	
+	short policy13Offset = 6;
+	
+	
+	//Binding
+	byte pinIsPresentFlag;
+	OwnerPIN pincode;
+	final byte PIN_TRY_LIMIT = 0x03;
+	final byte PIN_SIZE = 0x04;
+	final byte INCOMING_PIN_OFFSET = 0x00;
+	byte[] h0Buffer = new byte[32767];
+	//RSAPublicKey uPub;
+	//RSAPublicKey mPub;
+	
+	
+	
+	
+	//AESKey aesKey;
 	private cardTest() {
 		
 		//Instantiate all object the applet will ever need
@@ -81,6 +111,20 @@ public class cardTest extends Applet {
 		//}
 		
 		try{
+			
+			//Binding
+			pinIsPresentFlag = 0x00;
+			pincode = new OwnerPIN(PIN_TRY_LIMIT, PIN_SIZE);
+			
+			byte[] pincombination = {0x01, 0x03, 0x03, 0x07};
+			pincode.update(pincombination, (short) 0, (byte) 0x04);
+			
+			
+			
+			
+			keys = new KeyPair(KeyPair.ALG_RSA, KeyBuilder.LENGTH_RSA_512);
+			//keys = new KeyPair(KeyPair.ALG_RSA, KeyBuilder.LENGTH_RSA_2048);
+			
 			//Set signature algorithm
 			sig = Signature.getInstance(Signature.ALG_RSA_SHA_PKCS1, false);
 			//Generate the card keys
@@ -91,6 +135,24 @@ public class cardTest extends Applet {
 			k2 = (RSAPrivateKey) keys.getPrivate();
 			//Initialize the signature object with card private key
 			sig.init(k2, Signature.MODE_SIGN);
+			
+			//Crypto RSA
+			cipherRSA = Cipher.getInstance(Cipher.ALG_RSA_PKCS1, false);
+			
+			//Crypto AES
+			
+			/*
+			cipherAES = Cipher.getInstance(Cipher.ALG_AES_BLOCK_128_CBC_NOPAD, false);
+			aesKey = (AESKey) KeyBuilder.buildKey(KeyBuilder.TYPE_AES, KeyBuilder.LENGTH_AES_128, false);
+			randomData = RandomData.getInstance(RandomData.ALG_PSEUDO_RANDOM);
+			rnd = JCSystem.makeTransientByteArray((short)16, JCSystem.CLEAR_ON_RESET);
+			randomData.generateData(rnd, (short)0, (short)rnd.length);
+			aesKey.setKey(rnd, (short) 0);
+			*/
+			//
+		
+			
+			
 			}catch(CryptoException ex){
 			ISOException.throwIt((short)(ex.getReason()) );
 			}catch(SecurityException ex){
@@ -99,6 +161,8 @@ public class cardTest extends Applet {
 			ISOException.throwIt((short)(0x6F20));
 			}
 		
+			
+			
 	}
 
 	public static void install(byte[] bArray, short bOffset, byte bLength) {
@@ -113,7 +177,16 @@ public class cardTest extends Applet {
 			return;
 		}
 		
+		
 		byte[] buff = apdu.getBuffer();
+		output = new byte[32767];
+		
+		
+		short dataOffset = (short) 7;
+
+		 
+		
+		
 		//Get the incoming APDU
 		//Util.arrayCopy(apdu.getBuffer(),(short) 0, buff,(short) 0,(short) apdu.getBuffer().length);// apdu.getBuffer();
 		//Check the CLA 
@@ -168,13 +241,77 @@ public class cardTest extends Applet {
 		    size=(short) 2;
 		    Util.arrayCopy(buff, (short) 0, output, (short) 0, size);
 			break;
+			
+		case (byte) 0x05:
+			byte p1 = buff[ISO7816.OFFSET_P1];
+		
+			//First transaction
+			if(p1 == (byte) 0x01){
+				output[0] = 0x05; //Type of transaction
+				if(pincode.isValidated()){
+					output[1] = 0x01;
+				}
+				else{
+					output[1] = 0x00;
+				}
+				output[2] = pincode.getTriesRemaining(); //PINIsOKFlag
+				output[3] = 0x05;
+				output[4] = 0x05;
+				output[5] = 0x05;
+				
+				size = (short) 6;
+			}
+			
+			//Second transaction
+			else if(p1 == (byte) 0x02){
+				//pincode.check(buff, (short) 7, PIN_SIZE); //TODO: DATAOFFSET
+				output[0] = 0x05; //Type of transaction
+				/*
+				if(pincode.isValidated()){
+					output[1] = 0x09;
+					output[2] = 0x09;
+					size = (short) 3;
+					
+				}
+				else{
+					output[1] = 0x00;
+					output[2] = pincode.getTriesRemaining(); 
+					size = (short) 3;
+				}
+				*/
+				output[1] = 0x02;
+				output[2] = 0x02;
+				output[3] = 0x03;
+				output[4] = 0x03;
+				
+				size = (short) 7;
+				
+
+			}
+			
+			else if(p1 == (byte) 0x03){
+				if(pincode.isValidated()){
+					
+				}
+				else{
+					ISOException.throwIt(ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED);
+				}
+				//mPub.setExponent(arg0, arg1, arg2)
+				//aesKey.getKey(rnd, (short) 0);
+			}
+			
+			
+			
+			break;
 //			Sign arbitrary text sent to card
-		case (byte) SIGN_INPUT_DATA: 
+		/*case (byte) SIGN_INPUT_DATA: 
 			size=(short) buff[ISO7816.OFFSET_LC];
 		    size=sig.sign(buff,(short) (ISO7816.OFFSET_LC+1), size, output,
 					(short) 0);
 		    break;
 //			return the modulus of public keywith a random value sent from the host
+		*/
+		    /*
 		case (byte) SEND_AUTHENTICATED_PUB_EXP: 
 			//Find the size of the random value
 			size=(short) buff[ISO7816.OFFSET_LC];
@@ -187,23 +324,91 @@ public class cardTest extends Applet {
 		    //Util.arrayCopy(buff, (short) 0, bigArray, (short) (ISO7816.OFFSET_LC+size+1), len);
 		    size = sig.sign(bigArray,(short) 0,(short) bigArray.length,output, (short) 0);
 		    break;
+		    */
+		case (byte) 0x06:
+			byte p1RSA = buff[ISO7816.OFFSET_P1];
+			if(p1RSA == (byte) 0x01){
+				cipherRSA.init(k, Cipher.MODE_ENCRYPT);
+			}
+			else if(p1RSA == (byte) 0x02){
+				cipherRSA.init(k2, Cipher.MODE_DECRYPT);
+			}
+			
+			
+		
+			short bytesReadRSA = apdu.setIncomingAndReceive();
+			//size = bytesRead;
+			size = apdu.getIncomingLength();
+			short echoOffsetRSA = (short)0;
+			while(bytesReadRSA > 0){
+				Util.arrayCopyNonAtomic(buff, dataOffset, cryptoBuffer, echoOffsetRSA, bytesReadRSA);
+				echoOffsetRSA += bytesReadRSA;
+				bytesReadRSA = apdu.receiveBytes(dataOffset);
+			}
+			
+			
+			size = cipherRSA.doFinal(
+		               cryptoBuffer, 
+		               (short) 0,
+		               size,
+		               output,
+		               (short)0);
+			break;
 		    
 		case (byte) 0x07:
-			size=(short) 2;
-			output[0]=(byte) 0x09;
-			output[1]=(byte) 0x08;
-			break;
-		case (byte) 0x08:
-			short length = 256;
-			//short length = (short) buff.length;
-			size=(short) length;
-			//output[0]=(byte) 0x08;
-			//output[1]=(byte) 0x08;
 			
-			for(short i = 0; i < length; i++){
-				output[i] = (byte) buff[i];
-			}
+			
 			break;
+		case (byte) 0x08:	
+			
+			short bytesRead = apdu.setIncomingAndReceive();
+			//size = bytesRead;
+			size = apdu.getIncomingLength();
+			short echoOffset = (short)0;
+			while(bytesRead > 0){
+				Util.arrayCopyNonAtomic(buff, dataOffset, output, echoOffset, bytesRead);
+				echoOffset += bytesRead;
+	            bytesRead = apdu.receiveBytes(dataOffset);
+			}
+			
+			break;
+			
+		case (byte) 0x09:
+			byte p1AES = buff[ISO7816.OFFSET_P1];
+			if(p1AES == (byte) 0x01){
+				cipherAES.init(aesKey, Cipher.MODE_ENCRYPT);
+			}
+			else if(p1AES == (byte) 0x02){
+				cipherAES.init(aesKey, Cipher.MODE_DECRYPT);
+			}
+			
+			
+			short bytesReadECAES = apdu.setIncomingAndReceive();
+			//size = bytesRead;
+			size = apdu.getIncomingLength();
+			short echoOffsetECAES = (short)0;
+			while(bytesReadECAES > 0){
+				Util.arrayCopyNonAtomic(buff, dataOffset, cryptoBuffer, echoOffsetECAES, bytesReadECAES);
+				echoOffsetECAES += bytesReadECAES;
+				bytesReadECAES = apdu.receiveBytes(dataOffset);
+			}
+			
+			try{
+			size = cipherAES.doFinal(
+					cryptoBuffer, 
+		               (short) 0,
+		               (short) size,
+		               output,
+		               (short)0);
+			}
+			catch(CryptoException ex){
+				size = 2;
+				output[0] = (byte) ex.getReason();
+				output[1] = 0x02;
+			}
+				
+			break;
+			
 		default:
 			// good practice: If you don't know the INStruction, say so:
 			ISOException.throwIt(ISO7816.SW_INS_NOT_SUPPORTED);
