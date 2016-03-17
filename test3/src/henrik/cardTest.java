@@ -5,15 +5,11 @@ import javacard.framework.APDU;
 import javacard.framework.Applet;
 import javacard.framework.ISO7816;
 import javacard.framework.ISOException;
-import javacard.framework.JCSystem;
 import javacard.framework.OwnerPIN;
-import javacard.framework.PIN;
 import javacard.framework.Util;
 import javacard.security.CryptoException;
 import javacard.security.KeyBuilder;
 import javacard.security.KeyPair;
-import javacard.security.MessageDigest;
-import javacard.security.PublicKey;
 import javacard.security.RSAPrivateKey;
 import javacard.security.RSAPublicKey;
 import javacard.security.Signature;
@@ -21,13 +17,13 @@ import javacard.security.AESKey;
 import javacardx.apdu.ExtendedLength;
 import javacardx.crypto.*;
 import javacard.security.*;
-
-import java.lang.*;
+import javacard.framework.JCSystem;
 
 public class cardTest extends Applet implements ExtendedLength{
 	//Try to allocate all variable here and do not create new ones 
 	//The Public/Private key pair that this card will use
 	private KeyPair keys;
+	private KeyPair mKeys;
 	//Signature object to sign with card private key
 	private Signature sig;
 	//Card Public key
@@ -53,10 +49,6 @@ public class cardTest extends Applet implements ExtendedLength{
 	final short keysize=64;
 	//PIN
 	private OwnerPIN pin;
-	//max_length of pin
-	private final byte MAX_LENGTH=(byte) 0x04;
-	//Max number of attempts
-	private final byte MAX_ATTEMPTS=(byte) 0x05;
 	
 	//Predefined Commands
 	private final byte CLA=(byte) 0x80;
@@ -77,6 +69,7 @@ public class cardTest extends Applet implements ExtendedLength{
 	RandomData randomData;
 	byte[] rnd;
 	
+	
 	short policy13Offset = 6;
 	
 	
@@ -88,7 +81,7 @@ public class cardTest extends Applet implements ExtendedLength{
 	final byte INCOMING_PIN_OFFSET = 0x00;
 	byte[] h0Buffer = new byte[32767];
 	//RSAPublicKey uPub;
-	//RSAPublicKey mPub;
+	RSAPublicKey mPub;
 	
 	
 	
@@ -119,14 +112,20 @@ public class cardTest extends Applet implements ExtendedLength{
 			
 			
 			keys = new KeyPair(KeyPair.ALG_RSA, KeyBuilder.LENGTH_RSA_512);
+			mKeys = new KeyPair(KeyPair.ALG_RSA, KeyBuilder.LENGTH_RSA_512);
 			//keys = new KeyPair(KeyPair.ALG_RSA, KeyBuilder.LENGTH_RSA_2048);
 			
 			//Set signature algorithm
 			sig = Signature.getInstance(Signature.ALG_RSA_SHA_PKCS1, false);
+			
+			mKeys.genKeyPair();
+			mPub = (RSAPublicKey) mKeys.getPublic();
+			
 			//Generate the card keys
 			keys.genKeyPair();
 			//Get the public key
 			k = (RSAPublicKey) keys.getPublic();
+			
 			//Get the private key
 			k2 = (RSAPrivateKey) keys.getPrivate();
 			//Initialize the signature object with card private key
@@ -137,24 +136,24 @@ public class cardTest extends Applet implements ExtendedLength{
 			
 			//Crypto AES
 			
-			/*
+			
 			cipherAES = Cipher.getInstance(Cipher.ALG_AES_BLOCK_128_CBC_NOPAD, false);
 			aesKey = (AESKey) KeyBuilder.buildKey(KeyBuilder.TYPE_AES, KeyBuilder.LENGTH_AES_128, false);
 			randomData = RandomData.getInstance(RandomData.ALG_PSEUDO_RANDOM);
 			rnd = JCSystem.makeTransientByteArray((short)16, JCSystem.CLEAR_ON_RESET);
 			randomData.generateData(rnd, (short)0, (short)rnd.length);
 			aesKey.setKey(rnd, (short) 0);
-			*/
+			
 			//
 		
 			
 			
 			}catch(CryptoException ex){
-			ISOException.throwIt((short)(ex.getReason()) );
+				ISOException.throwIt((short)(ex.getReason()) );
 			}catch(SecurityException ex){
-			ISOException.throwIt((short)(0x6F10) );
+				ISOException.throwIt((short)(0x6F10) );
 			}catch(Exception ex){
-			ISOException.throwIt((short)(0x6F20));
+				ISOException.throwIt((short)(0x6F20));
 			}
 		
 			
@@ -175,7 +174,7 @@ public class cardTest extends Applet implements ExtendedLength{
 		
 		
 		byte[] buff = apdu.getBuffer();
-		output = new byte[32767];
+		//output = new byte[32767];
 		
 		
 		short dataOffset = (short) 7;
@@ -250,22 +249,30 @@ public class cardTest extends Applet implements ExtendedLength{
 				else{
 					output[1] = 0x00;
 				}
-				output[2] = pincode.getTriesRemaining(); //PINIsOKFlag
-				output[3] = 0x05;
-				output[4] = 0x05;
-				output[5] = 0x05;
 				
-				size = (short) 6;
+				output[2] = pincode.getTriesRemaining(); //PINIsOKFlag
+				size = (short) 3;
 			}
 			
 			//Second transaction
 			else if(p1 == (byte) 0x02){
-				//pincode.check(buff, (short) 7, PIN_SIZE); //TODO: DATAOFFSET
+				
+				//SAFE COPY TO NEW BUFFER
+				short bytesRead = apdu.setIncomingAndReceive();
+				size = apdu.getIncomingLength();
+				short echoOffset = (short)0;
+				while(bytesRead > 0){
+					Util.arrayCopyNonAtomic(buff, dataOffset, h0Buffer, echoOffset, bytesRead);
+					echoOffset += bytesRead;
+		            bytesRead = apdu.receiveBytes(dataOffset);
+				}
+				
+				pincode.check(h0Buffer, (short) 0, PIN_SIZE); 
 				output[0] = 0x05; //Type of transaction
-				/*
+				
 				if(pincode.isValidated()){
 					output[1] = 0x09;
-					output[2] = 0x09;
+					output[2] = 0x00;
 					size = (short) 3;
 					
 				}
@@ -274,26 +281,109 @@ public class cardTest extends Applet implements ExtendedLength{
 					output[2] = pincode.getTriesRemaining(); 
 					size = (short) 3;
 				}
-				*/
-				output[1] = 0x02;
-				output[2] = 0x02;
-				output[3] = 0x03;
-				output[4] = 0x03;
-				
-				size = (short) 7;
-				
-
 			}
 			
 			else if(p1 == (byte) 0x03){
-				if(pincode.isValidated()){
+//				SAFE COPY TO NEW BUFFER
+				short bytesRead = apdu.setIncomingAndReceive();
+				short incomingLength = apdu.getIncomingLength();
+				short echoOffset = (short)0;
+				while(bytesRead > 0){
+					Util.arrayCopyNonAtomic(buff, dataOffset, h0Buffer, echoOffset, bytesRead);
+					echoOffset += bytesRead;
+		            bytesRead = apdu.receiveBytes(dataOffset);
+				}
+				
+				short modLength = Util.makeShort((byte)0x00, h0Buffer[0]);
+				short expLenghtPos = (short) ((short) modLength + (short) 1);
+				short expLength = Util.makeShort((byte)0x00, h0Buffer[expLenghtPos]); 
+				short expStartPos = (short) (modLength + 2);
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				boolean mPubIsOK = false;
+				
+				
+				try{
+					mPub.setModulus(h0Buffer, (short) 1, modLength);
+					//size = mPub.getModulus(output, (short) 0);
+					mPub.setExponent(h0Buffer, expStartPos, expLength);
+					//size = mPub.getExponent(output, (short) 0);
+					mPubIsOK = true;
+				}
+				catch(CryptoException ex){
+					output[0] = (byte) ex.getReason();
+					output[1] = (byte) 0x09;
+					size = 2;
+				}
+				catch(Exception ex){
+					output[0] = (byte) 0x08;
+					output[1] = (byte) 0x08;
+					size = 2;
+				}
+				
+				if(mPubIsOK){
+					short totalsize = (short) (( (short) ( (short) mPub.getSize() + (short) k.getSize() + (short)  aesKey.getSize()) / (short) 8) + 10);
+					byte[] packet = new byte[totalsize];
+					short outputSize = 0;
 					
+					//AESKEY
+					aesKey.getKey(packet, (short) 0);
+					short AESKeyLength = (short) (aesKey.getSize()/8);
+					//mPub
+					Util.arrayCopyNonAtomic(h0Buffer, (short) 0, packet, AESKeyLength, (short) incomingLength);
+					short AESmPubLenght = (short) (incomingLength + AESKeyLength);
+					outputSize = AESmPubLenght;
+					
+					
+					
+					byte[] tempUPubArr = new byte[incomingLength];
+					
+					//uPub - modulus
+					short tempLength = k.getModulus(tempUPubArr, (short)0);
+					packet[outputSize] = (byte)tempLength;
+					outputSize += 1;
+					
+					Util.arrayCopyNonAtomic(tempUPubArr, (short) 0, packet, (short) (AESmPubLenght+1), tempLength);
+					outputSize += tempLength;
+					
+					//uPub - exponent
+					tempLength = k.getExponent(tempUPubArr, (short) 0);
+					packet[outputSize] = (byte)tempLength;
+					outputSize +=1;
+					Util.arrayCopyNonAtomic(tempUPubArr, (short) 0, packet, (short) (outputSize), tempLength);
+					
+					outputSize += tempLength;
+					
+					Util.arrayCopyNonAtomic(packet, (short) 0, output, (short) 0, outputSize);
+					size = totalsize;
+					
+					
+					
+					//size = (short) (aesKey.getSize() / 8);
+					//size = totalsize;
 				}
 				else{
-					ISOException.throwIt(ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED);
+					output[0] = 0x09;
+					output[1] = 0x09;
 				}
-				//mPub.setExponent(arg0, arg1, arg2)
-				//aesKey.getKey(rnd, (short) 0);
+				
+			}
+			else if(p1 == (byte) 0x09){
+				pincode.resetAndUnblock();
+				output[0] = 0x05;
+				output[1] = 0x05;
+				size = (short) 2;
 			}
 			
 			
