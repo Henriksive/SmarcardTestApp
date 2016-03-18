@@ -24,6 +24,7 @@ public class cardTest extends Applet implements ExtendedLength{
 	//The Public/Private key pair that this card will use
 	private KeyPair keys;
 	private KeyPair mKeys;
+	private KeyPair sKeys; //PLACEHOLDER
 	//Signature object to sign with card private key
 	private Signature sig;
 	//Card Public key
@@ -82,6 +83,7 @@ public class cardTest extends Applet implements ExtendedLength{
 	byte[] h0Buffer = new byte[32767];
 	//RSAPublicKey uPub;
 	RSAPublicKey mPub;
+	RSAPublicKey sPub; //PLACEHOLDER
 	
 	
 	
@@ -113,10 +115,14 @@ public class cardTest extends Applet implements ExtendedLength{
 			
 			keys = new KeyPair(KeyPair.ALG_RSA, KeyBuilder.LENGTH_RSA_512);
 			mKeys = new KeyPair(KeyPair.ALG_RSA, KeyBuilder.LENGTH_RSA_512);
+			sKeys = new KeyPair(KeyPair.ALG_RSA, KeyBuilder.LENGTH_RSA_2048);
 			//keys = new KeyPair(KeyPair.ALG_RSA, KeyBuilder.LENGTH_RSA_2048);
 			
 			//Set signature algorithm
 			sig = Signature.getInstance(Signature.ALG_RSA_SHA_PKCS1, false);
+			
+			sKeys.genKeyPair();
+			sPub = (RSAPublicKey) sKeys.getPublic();
 			
 			mKeys.genKeyPair();
 			mPub = (RSAPublicKey) mKeys.getPublic();
@@ -144,7 +150,7 @@ public class cardTest extends Applet implements ExtendedLength{
 			randomData.generateData(rnd, (short)0, (short)rnd.length);
 			aesKey.setKey(rnd, (short) 0);
 			
-			//
+			
 		
 			
 			
@@ -333,7 +339,7 @@ public class cardTest extends Applet implements ExtendedLength{
 				}
 				
 				if(mPubIsOK){
-					short totalsize = (short) (( (short) ( (short) mPub.getSize() + (short) k.getSize() + (short)  aesKey.getSize()) / (short) 8) + 10);
+					short totalsize = (short) (( (short) ( (short) mPub.getSize() + (short) k.getSize() + (short)  aesKey.getSize()) / (short) 8) + 10); //10 in header DANGEROUS
 					byte[] packet = new byte[totalsize];
 					short outputSize = 0;
 					
@@ -365,13 +371,38 @@ public class cardTest extends Applet implements ExtendedLength{
 					
 					outputSize += tempLength;
 					
-					Util.arrayCopyNonAtomic(packet, (short) 0, output, (short) 0, outputSize);
-					size = totalsize;
+					//Signing
+					short signatureSize = sig.sign(packet, (short) 0, totalsize, h0Buffer, (short) 0);
+					short h0UnencryptedLength = (short) (signatureSize + outputSize);
 					
+					//Create unencrypted package
+					byte[] h0Unencrypted = new byte[h0UnencryptedLength];
+					Util.arrayCopyNonAtomic(h0Buffer, (short) 0, h0Unencrypted, (short) 0, signatureSize);
+					Util.arrayCopyNonAtomic(packet, (short) 0, h0Unencrypted, signatureSize, totalsize);
 					
+					//Util.arrayCopyNonAtomic(h0Unencrypted, (short) 0, output, (short) 0, h0UnencryptedLength);
+					//size = h0UnencryptedLength;
 					
-					//size = (short) (aesKey.getSize() / 8);
-					//size = totalsize;
+					//Encrypt with sPub
+					cipherRSA.init(sPub, Cipher.MODE_ENCRYPT);
+					
+					try{
+						
+						size = cipherRSA.doFinal(
+					               h0Unencrypted, 
+					               (short) 0,
+					               h0UnencryptedLength,
+					               output,
+					               (short)0);
+					               
+					}
+					catch(CryptoException ex){
+						output[0] = 0x09;
+						output[1] = (byte) ex.getReason();
+						size = 2;
+					}
+					//size = h0UnencryptedLength;
+					//size = sPub.getModulus(output, (short) 0);
 				}
 				else{
 					output[0] = 0x09;
