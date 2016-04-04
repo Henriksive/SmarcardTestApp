@@ -1,5 +1,5 @@
 // converted by version 1.3
-// on Mon Apr 04 15:18:17 CEST 2016
+// on Mon Apr 04 17:02:07 CEST 2016
 
 .package henrik {
 	.aid 0x1:0x2:0x3:0x4:0x5:0x6:0x7:0x8:0x9:0x0;
@@ -55,43 +55,45 @@
 		// 17
 		instanceFieldRef 2.16 cardTest/keys;
 		// 18
-		instanceFieldRef 2.16 cardTest/mKeys;
-		// 19
 		instanceFieldRef 2.16 cardTest/sKeys;
-		// 20
+		// 19
 		instanceFieldRef 2.15 cardTest/sig;
-		// 21
+		// 20
 		instanceFieldRef 2.9 cardTest/sPub;
-		// 22
+		// 21
 		instanceFieldRef 2.9 cardTest/mPub;
-		// 23
+		// 22
 		instanceFieldRef 2.9 cardTest/k;
-		// 24
+		// 23
 		instanceFieldRef 2.8 cardTest/k2;
-		// 25
+		// 24
 		instanceFieldRef 3.1 cardTest/cipherRSA;
-		// 26
+		// 25
 		instanceFieldRef 3.1 cardTest/cipherAES;
-		// 27
+		// 26
 		instanceFieldRef 2.20 cardTest/aesKey;
-		// 28
+		// 27
 		instanceFieldRef 2.14 cardTest/randomData;
-		// 29
+		// 28
 		instanceFieldRef byte[] cardTest/rnd;
-		// 30
+		// 29
 		instanceFieldRef short cardTest/size;
-		// 31
+		// 30
 		instanceFieldRef 0.9 cardTest/pin;
-		// 32
+		// 31
 		instanceFieldRef byte[] cardTest/cryptoBuffer;
-		// 33
+		// 32
 		classRef 2.9;		// javacard/security/RSAPublicKey
+		// 33
+		classRef 0.9;		// javacard/framework/OwnerPIN
 		// 34
-		staticMethodRef 0.9.0(BB)V;		// javacard/framework/OwnerPIN.<init>(BB)V
+		staticMethodRef 2.13.0(BSZ)Ljavacard/security/Key;;		// javacard/security/KeyBuilder.buildKey(BSZ)Ljavacard/security/Key;
+			.descriptor	Ljavacard/security/Key;	2.0;
+
 		// 35
-		staticMethodRef 0.3.0()V;		// javacard/framework/Applet.<init>()V
+		staticMethodRef 0.9.0(BB)V;		// javacard/framework/OwnerPIN.<init>(BB)V
 		// 36
-		virtualMethodRef 0.9.8([BSB)V;		// update([BSB)V
+		staticMethodRef 0.3.0()V;		// javacard/framework/Applet.<init>()V
 		// 37
 		virtualMethodRef 2.16.2()Ljavacard/security/PrivateKey;;		// getPrivate()Ljavacard/security/PrivateKey;
 			.descriptor	Ljavacard/security/PrivateKey;	2.2;
@@ -99,7 +101,7 @@
 		// 38
 		classRef 2.8;		// javacard/security/RSAPrivateKey
 		// 39
-		classRef 2.16;		// javacard/security/KeyPair
+		virtualMethodRef 0.9.8([BSB)V;		// update([BSB)V
 		// 40
 		virtualMethodRef 2.15.3(Ljavacard/security/Key;B)V;		// init(Ljavacard/security/Key;B)V
 			.descriptor	Ljavacard/security/Key;	2.0;
@@ -109,96 +111,92 @@
 			.descriptor	Ljavacardx/crypto/Cipher;	3.1;
 
 		// 42
-		staticMethodRef 2.16.0(BS)V;		// javacard/security/KeyPair.<init>(BS)V
+		classRef 2.16;		// javacard/security/KeyPair
 		// 43
-		classRef 4.10;		// java/lang/SecurityException
+		staticMethodRef 2.16.0(BS)V;		// javacard/security/KeyPair.<init>(BS)V
 		// 44
-		staticMethodRef 2.13.0(BSZ)Ljavacard/security/Key;;		// javacard/security/KeyBuilder.buildKey(BSZ)Ljavacard/security/Key;
-			.descriptor	Ljavacard/security/Key;	2.0;
-
-		// 45
 		classRef 2.20;		// javacard/security/AESKey
+		// 45
+		classRef 4.10;		// java/lang/SecurityException
 		// 46
-		classRef 4.2;		// java/lang/Exception
-		// 47
 		staticMethodRef 2.14.0(B)Ljavacard/security/RandomData;;		// javacard/security/RandomData.getInstance(B)Ljavacard/security/RandomData;
 			.descriptor	Ljavacard/security/RandomData;	2.14;
 
+		// 47
+		classRef 4.2;		// java/lang/Exception
 		// 48
-		classRef 2.12;		// javacard/security/CryptoException
-		// 49
 		staticMethodRef 0.8.13(SB)[B;		// javacard/framework/JCSystem.makeTransientByteArray(SB)[B
-		// 50
+		// 49
 		staticMethodRef 2.15.0(BZ)Ljavacard/security/Signature;;		// javacard/security/Signature.getInstance(BZ)Ljavacard/security/Signature;
 			.descriptor	Ljavacard/security/Signature;	2.15;
 
-		// 51
+		// 50
 		virtualMethodRef 2.14.1([BSS)V;		// generateData([BSS)V
-		// 52
+		// 51
 		virtualMethodRef 2.12.1()S;		// getReason()S
-		// 53
+		// 52
 		staticMethodRef 0.7.1(S)V;		// javacard/framework/ISOException.throwIt(S)V
-		// 54
+		// 53
 		classRef cardTest;
-		// 55
+		// 54
 		staticMethodRef cardTest/<init>()V;
-		// 56
+		// 55
 		virtualMethodRef 0.3.1()V;		// register()V
-		// 57
+		// 56
 		virtualMethodRef 0.3.3()Z;		// selectingApplet()Z
-		// 58
+		// 57
 		virtualMethodRef 0.10.1()[B;		// getBuffer()[B
-		// 59
+		// 58
 		virtualMethodRef 2.15.5([BSS[BS)S;		// sign([BSS[BS)S
+		// 59
+		classRef 2.12;		// javacard/security/CryptoException
 		// 60
-		classRef 0.9;		// javacard/framework/OwnerPIN
-		// 61
 		virtualMethodRef 2.16.1()V;		// genKeyPair()V
-		// 62
+		// 61
 		virtualMethodRef 0.9.1([BSB)Z;		// check([BSB)Z
-		// 63
+		// 62
 		virtualMethodRef 0.9.5()V;		// reset()V
-		// 64
+		// 63
 		staticMethodRef cardTest/shortToByteArray(S)V;
-		// 65
+		// 64
 		staticMethodRef 0.16.1([BS[BSS)S;		// javacard/framework/Util.arrayCopy([BS[BSS)S
-		// 66
+		// 65
 		virtualMethodRef 0.9.4()Z;		// isValidated()Z
-		// 67
+		// 66
 		virtualMethodRef 0.9.2()B;		// getTriesRemaining()B
-		// 68
+		// 67
 		virtualMethodRef 0.10.6()S;		// setIncomingAndReceive()S
-		// 69
+		// 68
 		virtualMethodRef 0.10.15()S;		// getIncomingLength()S
-		// 70
+		// 69
 		staticMethodRef 0.16.5(BB)S;		// javacard/framework/Util.makeShort(BB)S
-		// 71
+		// 70
 		staticMethodRef 0.16.2([BS[BSS)S;		// javacard/framework/Util.arrayCopyNonAtomic([BS[BSS)S
-		// 72
+		// 71
 		virtualMethodRef 3.1.3(Ljavacard/security/Key;B)V;		// init(Ljavacard/security/Key;B)V
 			.descriptor	Ljavacard/security/Key;	2.0;
 
-		// 73
+		// 72
 		virtualMethodRef 3.1.1([BSS[BS)S;		// doFinal([BSS[BS)S
-		// 74
+		// 73
 		virtualMethodRef 0.9.6()V;		// resetAndUnblock()V
-		// 75
+		// 74
 		virtualMethodRef 2.16.3()Ljavacard/security/PublicKey;;		// getPublic()Ljavacard/security/PublicKey;
 			.descriptor	Ljavacard/security/PublicKey;	2.3;
 
-		// 76
+		// 75
 		staticMethodRef cardTest/send(Ljavacard/framework/APDU;)V;
 			.descriptor	Ljavacard/framework/APDU;	0.10;
 
-		// 77
+		// 76
 		virtualMethodRef 0.10.3(S)S;		// receiveBytes(S)S
-		// 78
+		// 77
 		virtualMethodRef 0.10.7()S;		// setOutgoing()S
-		// 79
+		// 78
 		virtualMethodRef 0.10.9(S)V;		// setOutgoingLength(S)V
-		// 80
+		// 79
 		virtualMethodRef 0.10.5([BSS)V;		// sendBytesLong([BSS)V
-		// 81
+		// 80
 		virtualMethodRef 0.10.8(SS)V;		// setOutgoingAndSend(SS)V
 	}
 
@@ -267,7 +265,7 @@
 			.locals 1;
 
 				L0:	aload_0;
-					invokespecial 35;		// javacard/framework/Applet.<init>()V
+					invokespecial 36;		// javacard/framework/Applet.<init>()V
 					aload_0;
 					bspush 6;
 					newarray 11;
@@ -345,11 +343,11 @@
 					sconst_0;
 					putfield_b 15;		// byte henrik/cardTest.pinIsPresentFlag
 					aload_0;
-					new 60;		// javacard/framework/OwnerPIN
+					new 33;		// javacard/framework/OwnerPIN
 					dup;
 					sconst_3;
 					sconst_4;
-					invokespecial 34;		// javacard/framework/OwnerPIN.<init>(BB)V
+					invokespecial 35;		// javacard/framework/OwnerPIN.<init>(BB)V
 					putfield_a 16;		// reference henrik/cardTest.pincode
 					sconst_4;
 					newarray 11;
@@ -374,118 +372,111 @@
 					aload_1;
 					sconst_0;
 					sconst_4;
-					invokevirtual 36;		// update([BSB)V
+					invokevirtual 39;		// update([BSB)V
 					aload_0;
-					new 39;		// javacard/security/KeyPair
+					new 42;		// javacard/security/KeyPair
 					dup;
 					sconst_1;
 					sspush 512;
-					invokespecial 42;		// javacard/security/KeyPair.<init>(BS)V
+					invokespecial 43;		// javacard/security/KeyPair.<init>(BS)V
 					putfield_a 17;		// reference henrik/cardTest.keys
 					aload_0;
-					new 39;		// javacard/security/KeyPair
-					dup;
-					sconst_1;
-					sspush 512;
-					invokespecial 42;		// javacard/security/KeyPair.<init>(BS)V
-					putfield_a 18;		// reference henrik/cardTest.mKeys
-					aload_0;
-					new 39;		// javacard/security/KeyPair
+					new 42;		// javacard/security/KeyPair
 					dup;
 					sconst_1;
 					sspush 2048;
-					invokespecial 42;		// javacard/security/KeyPair.<init>(BS)V
-					putfield_a 19;		// reference henrik/cardTest.sKeys
+					invokespecial 43;		// javacard/security/KeyPair.<init>(BS)V
+					putfield_a 18;		// reference henrik/cardTest.sKeys
 					aload_0;
 					bspush 10;
 					sconst_0;
-					invokestatic 50;		// javacard/security/Signature.getInstance(BZ)Ljavacard/security/Signature;
-					putfield_a 20;		// reference henrik/cardTest.sig
-					getfield_a_this 19;		// reference henrik/cardTest.sKeys
-					invokevirtual 61;		// genKeyPair()V
+					invokestatic 49;		// javacard/security/Signature.getInstance(BZ)Ljavacard/security/Signature;
+					putfield_a 19;		// reference henrik/cardTest.sig
+					getfield_a_this 18;		// reference henrik/cardTest.sKeys
+					invokevirtual 60;		// genKeyPair()V
 					aload_0;
-					getfield_a_this 19;		// reference henrik/cardTest.sKeys
-					invokevirtual 75;		// getPublic()Ljavacard/security/PublicKey;
-					checkcast 0 33;		// T_CLASSORINTERFACE javacard/security/RSAPublicKey
-					putfield_a 21;		// reference henrik/cardTest.sPub
-					getfield_a_this 18;		// reference henrik/cardTest.mKeys
-					invokevirtual 61;		// genKeyPair()V
+					getfield_a_this 18;		// reference henrik/cardTest.sKeys
+					invokevirtual 74;		// getPublic()Ljavacard/security/PublicKey;
+					checkcast 0 32;		// T_CLASSORINTERFACE javacard/security/RSAPublicKey
+					putfield_a 20;		// reference henrik/cardTest.sPub
 					aload_0;
-					getfield_a_this 18;		// reference henrik/cardTest.mKeys
-					invokevirtual 75;		// getPublic()Ljavacard/security/PublicKey;
-					checkcast 0 33;		// T_CLASSORINTERFACE javacard/security/RSAPublicKey
-					putfield_a 22;		// reference henrik/cardTest.mPub
+					sconst_4;
+					sspush 512;
+					sconst_0;
+					invokestatic 34;		// javacard/security/KeyBuilder.buildKey(BSZ)Ljavacard/security/Key;
+					checkcast 0 32;		// T_CLASSORINTERFACE javacard/security/RSAPublicKey
+					putfield_a 21;		// reference henrik/cardTest.mPub
 					getfield_a_this 17;		// reference henrik/cardTest.keys
-					invokevirtual 61;		// genKeyPair()V
+					invokevirtual 60;		// genKeyPair()V
 					aload_0;
 					getfield_a_this 17;		// reference henrik/cardTest.keys
-					invokevirtual 75;		// getPublic()Ljavacard/security/PublicKey;
-					checkcast 0 33;		// T_CLASSORINTERFACE javacard/security/RSAPublicKey
-					putfield_a 23;		// reference henrik/cardTest.k
+					invokevirtual 74;		// getPublic()Ljavacard/security/PublicKey;
+					checkcast 0 32;		// T_CLASSORINTERFACE javacard/security/RSAPublicKey
+					putfield_a 22;		// reference henrik/cardTest.k
 					aload_0;
 					getfield_a_this 17;		// reference henrik/cardTest.keys
 					invokevirtual 37;		// getPrivate()Ljavacard/security/PrivateKey;
 					checkcast 0 38;		// T_CLASSORINTERFACE javacard/security/RSAPrivateKey
-					putfield_a 24;		// reference henrik/cardTest.k2
-					getfield_a_this 20;		// reference henrik/cardTest.sig
-					getfield_a_this 24;		// reference henrik/cardTest.k2
+					putfield_a 23;		// reference henrik/cardTest.k2
+					getfield_a_this 19;		// reference henrik/cardTest.sig
+					getfield_a_this 23;		// reference henrik/cardTest.k2
 					sconst_1;
 					invokevirtual 40;		// init(Ljavacard/security/Key;B)V
 					aload_0;
 					bspush 10;
 					sconst_0;
 					invokestatic 41;		// javacardx/crypto/Cipher.getInstance(BZ)Ljavacardx/crypto/Cipher;
-					putfield_a 25;		// reference henrik/cardTest.cipherRSA
+					putfield_a 24;		// reference henrik/cardTest.cipherRSA
 					aload_0;
 					bspush 13;
 					sconst_0;
 					invokestatic 41;		// javacardx/crypto/Cipher.getInstance(BZ)Ljavacardx/crypto/Cipher;
-					putfield_a 26;		// reference henrik/cardTest.cipherAES
+					putfield_a 25;		// reference henrik/cardTest.cipherAES
 					aload_0;
 					bspush 15;
 					sspush 128;
 					sconst_0;
-					invokestatic 44;		// javacard/security/KeyBuilder.buildKey(BSZ)Ljavacard/security/Key;
-					checkcast 0 45;		// T_CLASSORINTERFACE javacard/security/AESKey
-					putfield_a 27;		// reference henrik/cardTest.aesKey
+					invokestatic 34;		// javacard/security/KeyBuilder.buildKey(BSZ)Ljavacard/security/Key;
+					checkcast 0 44;		// T_CLASSORINTERFACE javacard/security/AESKey
+					putfield_a 26;		// reference henrik/cardTest.aesKey
 					aload_0;
 					sconst_1;
-					invokestatic 47;		// javacard/security/RandomData.getInstance(B)Ljavacard/security/RandomData;
-					putfield_a 28;		// reference henrik/cardTest.randomData
+					invokestatic 46;		// javacard/security/RandomData.getInstance(B)Ljavacard/security/RandomData;
+					putfield_a 27;		// reference henrik/cardTest.randomData
 					aload_0;
 					bspush 16;
 					sconst_1;
-					invokestatic 49;		// javacard/framework/JCSystem.makeTransientByteArray(SB)[B
-					putfield_a 29;		// reference henrik/cardTest.rnd
-					getfield_a_this 28;		// reference henrik/cardTest.randomData
-					getfield_a_this 29;		// reference henrik/cardTest.rnd
+					invokestatic 48;		// javacard/framework/JCSystem.makeTransientByteArray(SB)[B
+					putfield_a 28;		// reference henrik/cardTest.rnd
+					getfield_a_this 27;		// reference henrik/cardTest.randomData
+					getfield_a_this 28;		// reference henrik/cardTest.rnd
 					sconst_0;
-					getfield_a_this 29;		// reference henrik/cardTest.rnd
+					getfield_a_this 28;		// reference henrik/cardTest.rnd
 					arraylength;
-					invokevirtual 51;		// generateData([BSS)V
-					getfield_a_this 27;		// reference henrik/cardTest.aesKey
-					getfield_a_this 29;		// reference henrik/cardTest.rnd
+					invokevirtual 50;		// generateData([BSS)V
+					getfield_a_this 26;		// reference henrik/cardTest.aesKey
+					getfield_a_this 28;		// reference henrik/cardTest.rnd
 					sconst_0;
-					invokeinterface 3 45 4;		// javacard/security/AESKey
+					invokeinterface 3 44 4;		// javacard/security/AESKey
 				L2:	goto L6;
 				L3:	astore_1;
 					aload_1;
-					invokevirtual 52;		// getReason()S
-					invokestatic 53;		// javacard/framework/ISOException.throwIt(S)V
+					invokevirtual 51;		// getReason()S
+					invokestatic 52;		// javacard/framework/ISOException.throwIt(S)V
 					goto L6;
 				L4:	astore_1;
 					sspush 28432;
-					invokestatic 53;		// javacard/framework/ISOException.throwIt(S)V
+					invokestatic 52;		// javacard/framework/ISOException.throwIt(S)V
 					goto L6;
 				L5:	astore_1;
 					sspush 28448;
-					invokestatic 53;		// javacard/framework/ISOException.throwIt(S)V
+					invokestatic 52;		// javacard/framework/ISOException.throwIt(S)V
 				L6:	return;
 			.exceptionTable {
 				// start_block end_block handler_block catch_type_index
-				L1 L2 L3 48;
-				L1 L2 L4 43;
-				L1 L2 L5 46;
+				L1 L2 L3 59;
+				L1 L2 L4 45;
+				L1 L2 L5 47;
 			}
 		}
 
@@ -493,10 +484,10 @@
 			.stack 2;
 			.locals 0;
 
-				L0:	new 54;		// henrik/cardTest
+				L0:	new 53;		// henrik/cardTest
 					dup;
-					invokespecial 55;		// henrik/cardTest.<init>()V
-					invokevirtual 56;		// register()V
+					invokespecial 54;		// henrik/cardTest.<init>()V
+					invokevirtual 55;		// register()V
 					return;
 		}
 
@@ -507,11 +498,11 @@
 			.descriptor	Ljavacard/framework/APDU;	0.10;
 
 				L0:	aload_0;
-					invokevirtual 57;		// selectingApplet()Z
+					invokevirtual 56;		// selectingApplet()Z
 					ifeq L2;
 				L1:	return;
 				L2:	aload_1;
-					invokevirtual 58;		// getBuffer()[B
+					invokevirtual 57;		// getBuffer()[B
 					astore_2;
 					bspush 7;
 					sstore_3;
@@ -520,29 +511,29 @@
 					baload;
 					stableswitch L67 0 9 L3 L4 L5 L6 L14 L15 L44 L52 L53 L57;
 				L3:	aload_0;
-					getfield_a_this 20;		// reference henrik/cardTest.sig
+					getfield_a_this 19;		// reference henrik/cardTest.sig
 					getfield_a_this 0;		// reference henrik/cardTest.test
 					sconst_0;
 					getfield_a_this 0;		// reference henrik/cardTest.test
 					arraylength;
 					getfield_a_this 1;		// reference henrik/cardTest.output
 					sconst_0;
-					invokevirtual 59;		// sign([BSS[BS)S
-					putfield_s 30;		// short henrik/cardTest.size
+					invokevirtual 58;		// sign([BSS[BS)S
+					putfield_s 29;		// short henrik/cardTest.size
 					goto_w L68;
 				L4:	aload_0;
-					getfield_a_this 23;		// reference henrik/cardTest.k
+					getfield_a_this 22;		// reference henrik/cardTest.k
 					getfield_a_this 1;		// reference henrik/cardTest.output
 					sconst_0;
-					invokeinterface 3 33 5;		// javacard/security/RSAPublicKey
-					putfield_s 30;		// short henrik/cardTest.size
+					invokeinterface 3 32 5;		// javacard/security/RSAPublicKey
+					putfield_s 29;		// short henrik/cardTest.size
 					goto_w L68;
 				L5:	aload_0;
-					getfield_a_this 23;		// reference henrik/cardTest.k
+					getfield_a_this 22;		// reference henrik/cardTest.k
 					getfield_a_this 1;		// reference henrik/cardTest.output
 					sconst_0;
-					invokeinterface 3 33 4;		// javacard/security/RSAPublicKey
-					putfield_s 30;		// short henrik/cardTest.size
+					invokeinterface 3 32 4;		// javacard/security/RSAPublicKey
+					putfield_s 29;		// short henrik/cardTest.size
 					goto_w L68;
 				L6:	aload_2;
 					sconst_2;
@@ -553,50 +544,50 @@
 					sconst_4;
 					baload;
 					ifeq L11;
-				L8:	getfield_a_this 31;		// reference henrik/cardTest.pin
+				L8:	getfield_a_this 30;		// reference henrik/cardTest.pin
 					aload_2;
 					sconst_5;
 					aload_2;
 					sconst_4;
 					baload;
-					invokevirtual 62;		// check([BSB)Z
+					invokevirtual 61;		// check([BSB)Z
 					ifeq L10;
 				L9:	aload_0;
-					getfield_a_this 24;		// reference henrik/cardTest.k2
+					getfield_a_this 23;		// reference henrik/cardTest.k2
 					getfield_a_this 1;		// reference henrik/cardTest.output
 					sconst_0;
 					invokeinterface 3 38 4;		// javacard/security/RSAPrivateKey
-					putfield_s 30;		// short henrik/cardTest.size
-					getfield_a_this 31;		// reference henrik/cardTest.pin
-					invokevirtual 63;		// reset()V
+					putfield_s 29;		// short henrik/cardTest.size
+					getfield_a_this 30;		// reference henrik/cardTest.pin
+					invokevirtual 62;		// reset()V
 					goto L13;
 				L10:	sspush 27264;
-					invokestatic 53;		// javacard/framework/ISOException.throwIt(S)V
+					invokestatic 52;		// javacard/framework/ISOException.throwIt(S)V
 					goto L13;
 				L11:	sspush 27013;
-					invokestatic 53;		// javacard/framework/ISOException.throwIt(S)V
+					invokestatic 52;		// javacard/framework/ISOException.throwIt(S)V
 					goto L13;
 				L12:	sspush 27270;
-					invokestatic 53;		// javacard/framework/ISOException.throwIt(S)V
+					invokestatic 52;		// javacard/framework/ISOException.throwIt(S)V
 				L13:	aload_0;
-					getfield_a_this 24;		// reference henrik/cardTest.k2
+					getfield_a_this 23;		// reference henrik/cardTest.k2
 					getfield_a_this 1;		// reference henrik/cardTest.output
 					sconst_0;
 					invokeinterface 3 38 4;		// javacard/security/RSAPrivateKey
-					putfield_s 30;		// short henrik/cardTest.size
+					putfield_s 29;		// short henrik/cardTest.size
 					goto_w L68;
 				L14:	aload_0;
 					bspush 64;
-					invokespecial 64;		// henrik/cardTest.shortToByteArray(S)V
+					invokespecial 63;		// henrik/cardTest.shortToByteArray(S)V
 					aload_0;
 					sconst_2;
-					putfield_s 30;		// short henrik/cardTest.size
+					putfield_s 29;		// short henrik/cardTest.size
 					aload_2;
 					sconst_0;
 					getfield_a_this 1;		// reference henrik/cardTest.output
 					sconst_0;
-					getfield_s_this 30;		// short henrik/cardTest.size
-					invokestatic 65;		// javacard/framework/Util.arrayCopy([BS[BSS)S
+					getfield_s_this 29;		// short henrik/cardTest.size
+					invokestatic 64;		// javacard/framework/Util.arrayCopy([BS[BSS)S
 					pop;
 					goto_w L68;
 				L15:	aload_2;
@@ -611,7 +602,7 @@
 					sconst_5;
 					bastore;
 					getfield_a_this 16;		// reference henrik/cardTest.pincode
-					invokevirtual 66;		// isValidated()Z
+					invokevirtual 65;		// isValidated()Z
 					ifeq L18;
 				L17:	getfield_a_this 1;		// reference henrik/cardTest.output
 					sconst_1;
@@ -625,22 +616,22 @@
 				L19:	getfield_a_this 1;		// reference henrik/cardTest.output
 					sconst_2;
 					getfield_a_this 16;		// reference henrik/cardTest.pincode
-					invokevirtual 67;		// getTriesRemaining()B
+					invokevirtual 66;		// getTriesRemaining()B
 					bastore;
 					aload_0;
 					sconst_3;
-					putfield_s 30;		// short henrik/cardTest.size
+					putfield_s 29;		// short henrik/cardTest.size
 					goto_w L68;
 				L20:	sload 4;
 					sconst_2;
 					if_scmpne L27;
 				L21:	aload_1;
-					invokevirtual 68;		// setIncomingAndReceive()S
+					invokevirtual 67;		// setIncomingAndReceive()S
 					sstore 5;
 					aload_0;
 					aload_1;
-					invokevirtual 69;		// getIncomingLength()S
-					putfield_s 30;		// short henrik/cardTest.size
+					invokevirtual 68;		// getIncomingLength()S
+					putfield_s 29;		// short henrik/cardTest.size
 					sconst_0;
 					sstore 6;
 					goto L23;
@@ -649,7 +640,7 @@
 					getfield_a_this 14;		// reference henrik/cardTest.h0Buffer
 					sload 6;
 					sload 5;
-					invokestatic 71;		// javacard/framework/Util.arrayCopyNonAtomic([BS[BSS)S
+					invokestatic 70;		// javacard/framework/Util.arrayCopyNonAtomic([BS[BSS)S
 					pop;
 					sload 6;
 					sload 5;
@@ -657,7 +648,7 @@
 					sstore 6;
 					aload_1;
 					sload_3;
-					invokevirtual 77;		// receiveBytes(S)S
+					invokevirtual 76;		// receiveBytes(S)S
 					sstore 5;
 				L23:	sload 5;
 					ifgt L22;
@@ -665,14 +656,14 @@
 					getfield_a_this 14;		// reference henrik/cardTest.h0Buffer
 					sconst_0;
 					sconst_4;
-					invokevirtual 62;		// check([BSB)Z
+					invokevirtual 61;		// check([BSB)Z
 					pop;
 					getfield_a_this 1;		// reference henrik/cardTest.output
 					sconst_0;
 					sconst_5;
 					bastore;
 					getfield_a_this 16;		// reference henrik/cardTest.pincode
-					invokevirtual 66;		// isValidated()Z
+					invokevirtual 65;		// isValidated()Z
 					ifeq L26;
 				L25:	getfield_a_this 1;		// reference henrik/cardTest.output
 					sconst_1;
@@ -684,7 +675,7 @@
 					bastore;
 					aload_0;
 					sconst_3;
-					putfield_s 30;		// short henrik/cardTest.size
+					putfield_s 29;		// short henrik/cardTest.size
 					goto_w L68;
 				L26:	getfield_a_this 1;		// reference henrik/cardTest.output
 					sconst_1;
@@ -693,20 +684,20 @@
 					getfield_a_this 1;		// reference henrik/cardTest.output
 					sconst_2;
 					getfield_a_this 16;		// reference henrik/cardTest.pincode
-					invokevirtual 67;		// getTriesRemaining()B
+					invokevirtual 66;		// getTriesRemaining()B
 					bastore;
 					aload_0;
 					sconst_3;
-					putfield_s 30;		// short henrik/cardTest.size
+					putfield_s 29;		// short henrik/cardTest.size
 					goto_w L68;
 				L27:	sload 4;
 					sconst_3;
 					if_scmpne_w L42;
 				L28:	aload_1;
-					invokevirtual 68;		// setIncomingAndReceive()S
+					invokevirtual 67;		// setIncomingAndReceive()S
 					sstore 5;
 					aload_1;
-					invokevirtual 69;		// getIncomingLength()S
+					invokevirtual 68;		// getIncomingLength()S
 					sstore 6;
 					sconst_0;
 					sstore 7;
@@ -716,7 +707,7 @@
 					getfield_a_this 14;		// reference henrik/cardTest.h0Buffer
 					sload 7;
 					sload 5;
-					invokestatic 71;		// javacard/framework/Util.arrayCopyNonAtomic([BS[BSS)S
+					invokestatic 70;		// javacard/framework/Util.arrayCopyNonAtomic([BS[BSS)S
 					pop;
 					sload 7;
 					sload 5;
@@ -724,7 +715,7 @@
 					sstore 7;
 					aload_1;
 					sload_3;
-					invokevirtual 77;		// receiveBytes(S)S
+					invokevirtual 76;		// receiveBytes(S)S
 					sstore 5;
 				L30:	sload 5;
 					ifgt L29;
@@ -732,7 +723,7 @@
 					getfield_a_this 14;		// reference henrik/cardTest.h0Buffer
 					sconst_0;
 					baload;
-					invokestatic 70;		// javacard/framework/Util.makeShort(BB)S
+					invokestatic 69;		// javacard/framework/Util.makeShort(BB)S
 					sstore 8;
 					sload 8;
 					sconst_1;
@@ -742,7 +733,7 @@
 					getfield_a_this 14;		// reference henrik/cardTest.h0Buffer
 					sload 9;
 					baload;
-					invokestatic 70;		// javacard/framework/Util.makeShort(BB)S
+					invokestatic 69;		// javacard/framework/Util.makeShort(BB)S
 					sstore 10;
 					sload 8;
 					sconst_2;
@@ -750,16 +741,16 @@
 					sstore 11;
 					sconst_0;
 					sstore 12;
-				L32:	getfield_a_this 22;		// reference henrik/cardTest.mPub
+				L32:	getfield_a_this 21;		// reference henrik/cardTest.mPub
 					getfield_a_this 14;		// reference henrik/cardTest.h0Buffer
 					sconst_1;
 					sload 8;
-					invokeinterface 4 33 7;		// javacard/security/RSAPublicKey
-					getfield_a_this 22;		// reference henrik/cardTest.mPub
+					invokeinterface 4 32 7;		// javacard/security/RSAPublicKey
+					getfield_a_this 21;		// reference henrik/cardTest.mPub
 					getfield_a_this 14;		// reference henrik/cardTest.h0Buffer
 					sload 11;
 					sload 10;
-					invokeinterface 4 33 6;		// javacard/security/RSAPublicKey
+					invokeinterface 4 32 6;		// javacard/security/RSAPublicKey
 					sconst_1;
 					sstore 12;
 				L33:	goto L36;
@@ -767,7 +758,7 @@
 					getfield_a_this 1;		// reference henrik/cardTest.output
 					sconst_0;
 					aload 13;
-					invokevirtual 52;		// getReason()S
+					invokevirtual 51;		// getReason()S
 					s2b;
 					bastore;
 					getfield_a_this 1;		// reference henrik/cardTest.output
@@ -776,7 +767,7 @@
 					bastore;
 					aload_0;
 					sconst_2;
-					putfield_s 30;		// short henrik/cardTest.size
+					putfield_s 29;		// short henrik/cardTest.size
 					goto_w L68;
 				L35:	astore 13;
 					getfield_a_this 1;		// reference henrik/cardTest.output
@@ -789,17 +780,17 @@
 					bastore;
 					aload_0;
 					sconst_2;
-					putfield_s 30;		// short henrik/cardTest.size
+					putfield_s 29;		// short henrik/cardTest.size
 					goto_w L68;
 				L36:	sload 12;
 					ifeq_w L41;
-				L37:	getfield_a_this 22;		// reference henrik/cardTest.mPub
-					invokeinterface 1 33 1;		// javacard/security/RSAPublicKey
-					getfield_a_this 23;		// reference henrik/cardTest.k
-					invokeinterface 1 33 1;		// javacard/security/RSAPublicKey
+				L37:	getfield_a_this 21;		// reference henrik/cardTest.mPub
+					invokeinterface 1 32 1;		// javacard/security/RSAPublicKey
+					getfield_a_this 22;		// reference henrik/cardTest.k
+					invokeinterface 1 32 1;		// javacard/security/RSAPublicKey
 					sadd;
-					getfield_a_this 27;		// reference henrik/cardTest.aesKey
-					invokeinterface 1 45 1;		// javacard/security/AESKey
+					getfield_a_this 26;		// reference henrik/cardTest.aesKey
+					invokeinterface 1 44 1;		// javacard/security/AESKey
 					sadd;
 					bspush 8;
 					sdiv;
@@ -811,13 +802,13 @@
 					astore 14;
 					sconst_0;
 					sstore 15;
-					getfield_a_this 27;		// reference henrik/cardTest.aesKey
+					getfield_a_this 26;		// reference henrik/cardTest.aesKey
 					aload 14;
 					sconst_0;
-					invokeinterface 3 45 5;		// javacard/security/AESKey
+					invokeinterface 3 44 5;		// javacard/security/AESKey
 					pop;
-					getfield_a_this 27;		// reference henrik/cardTest.aesKey
-					invokeinterface 1 45 1;		// javacard/security/AESKey
+					getfield_a_this 26;		// reference henrik/cardTest.aesKey
+					invokeinterface 1 44 1;		// javacard/security/AESKey
 					bspush 8;
 					sdiv;
 					sstore 16;
@@ -826,7 +817,7 @@
 					aload 14;
 					sload 16;
 					sload 6;
-					invokestatic 71;		// javacard/framework/Util.arrayCopyNonAtomic([BS[BSS)S
+					invokestatic 70;		// javacard/framework/Util.arrayCopyNonAtomic([BS[BSS)S
 					pop;
 					sload 6;
 					sload 16;
@@ -837,10 +828,10 @@
 					sload 6;
 					newarray 11;
 					astore 18;
-					getfield_a_this 23;		// reference henrik/cardTest.k
+					getfield_a_this 22;		// reference henrik/cardTest.k
 					aload 18;
 					sconst_0;
-					invokeinterface 3 33 5;		// javacard/security/RSAPublicKey
+					invokeinterface 3 32 5;		// javacard/security/RSAPublicKey
 					sstore 19;
 					aload 14;
 					sload 15;
@@ -855,16 +846,16 @@
 					sconst_1;
 					sadd;
 					sload 19;
-					invokestatic 71;		// javacard/framework/Util.arrayCopyNonAtomic([BS[BSS)S
+					invokestatic 70;		// javacard/framework/Util.arrayCopyNonAtomic([BS[BSS)S
 					pop;
 					sload 15;
 					sload 19;
 					sadd;
 					sstore 15;
-					getfield_a_this 23;		// reference henrik/cardTest.k
+					getfield_a_this 22;		// reference henrik/cardTest.k
 					aload 18;
 					sconst_0;
-					invokeinterface 3 33 4;		// javacard/security/RSAPublicKey
+					invokeinterface 3 32 4;		// javacard/security/RSAPublicKey
 					sstore 19;
 					aload 14;
 					sload 15;
@@ -877,19 +868,19 @@
 					aload 14;
 					sload 15;
 					sload 19;
-					invokestatic 71;		// javacard/framework/Util.arrayCopyNonAtomic([BS[BSS)S
+					invokestatic 70;		// javacard/framework/Util.arrayCopyNonAtomic([BS[BSS)S
 					pop;
 					sload 15;
 					sload 19;
 					sadd;
 					sstore 15;
-					getfield_a_this 20;		// reference henrik/cardTest.sig
+					getfield_a_this 19;		// reference henrik/cardTest.sig
 					aload 14;
 					sconst_0;
 					sload 13;
 					getfield_a_this 14;		// reference henrik/cardTest.h0Buffer
 					sconst_0;
-					invokevirtual 59;		// sign([BSS[BS)S
+					invokevirtual 58;		// sign([BSS[BS)S
 					sstore 20;
 					sload 20;
 					sload 15;
@@ -903,28 +894,28 @@
 					aload 22;
 					sconst_0;
 					sload 20;
-					invokestatic 71;		// javacard/framework/Util.arrayCopyNonAtomic([BS[BSS)S
+					invokestatic 70;		// javacard/framework/Util.arrayCopyNonAtomic([BS[BSS)S
 					pop;
 					aload 14;
 					sconst_0;
 					aload 22;
 					sload 20;
 					sload 13;
-					invokestatic 71;		// javacard/framework/Util.arrayCopyNonAtomic([BS[BSS)S
+					invokestatic 70;		// javacard/framework/Util.arrayCopyNonAtomic([BS[BSS)S
 					pop;
-					getfield_a_this 25;		// reference henrik/cardTest.cipherRSA
-					getfield_a_this 21;		// reference henrik/cardTest.sPub
+					getfield_a_this 24;		// reference henrik/cardTest.cipherRSA
+					getfield_a_this 20;		// reference henrik/cardTest.sPub
 					sconst_2;
-					invokevirtual 72;		// init(Ljavacard/security/Key;B)V
+					invokevirtual 71;		// init(Ljavacard/security/Key;B)V
 				L38:	aload_0;
-					getfield_a_this 25;		// reference henrik/cardTest.cipherRSA
+					getfield_a_this 24;		// reference henrik/cardTest.cipherRSA
 					aload 22;
 					sconst_0;
 					sload 21;
 					getfield_a_this 1;		// reference henrik/cardTest.output
 					sconst_0;
-					invokevirtual 73;		// doFinal([BSS[BS)S
-					putfield_s 30;		// short henrik/cardTest.size
+					invokevirtual 72;		// doFinal([BSS[BS)S
+					putfield_s 29;		// short henrik/cardTest.size
 				L39:	goto_w L68;
 				L40:	astore 23;
 					getfield_a_this 1;		// reference henrik/cardTest.output
@@ -934,12 +925,12 @@
 					getfield_a_this 1;		// reference henrik/cardTest.output
 					sconst_1;
 					aload 23;
-					invokevirtual 52;		// getReason()S
+					invokevirtual 51;		// getReason()S
 					s2b;
 					bastore;
 					aload_0;
 					sconst_2;
-					putfield_s 30;		// short henrik/cardTest.size
+					putfield_s 29;		// short henrik/cardTest.size
 					goto_w L68;
 				L41:	getfield_a_this 1;		// reference henrik/cardTest.output
 					sconst_0;
@@ -954,7 +945,7 @@
 					bspush 9;
 					if_scmpne_w L68;
 				L43:	getfield_a_this 16;		// reference henrik/cardTest.pincode
-					invokevirtual 74;		// resetAndUnblock()V
+					invokevirtual 73;		// resetAndUnblock()V
 					getfield_a_this 1;		// reference henrik/cardTest.output
 					sconst_0;
 					sconst_5;
@@ -965,7 +956,7 @@
 					bastore;
 					aload_0;
 					sconst_2;
-					putfield_s 30;		// short henrik/cardTest.size
+					putfield_s 29;		// short henrik/cardTest.size
 					goto_w L68;
 				L44:	aload_2;
 					sconst_2;
@@ -974,34 +965,34 @@
 					sload 5;
 					sconst_1;
 					if_scmpne L46;
-				L45:	getfield_a_this 25;		// reference henrik/cardTest.cipherRSA
-					getfield_a_this 23;		// reference henrik/cardTest.k
+				L45:	getfield_a_this 24;		// reference henrik/cardTest.cipherRSA
+					getfield_a_this 22;		// reference henrik/cardTest.k
 					sconst_2;
-					invokevirtual 72;		// init(Ljavacard/security/Key;B)V
+					invokevirtual 71;		// init(Ljavacard/security/Key;B)V
 					goto L48;
 				L46:	sload 5;
 					sconst_2;
 					if_scmpne L48;
-				L47:	getfield_a_this 25;		// reference henrik/cardTest.cipherRSA
-					getfield_a_this 24;		// reference henrik/cardTest.k2
+				L47:	getfield_a_this 24;		// reference henrik/cardTest.cipherRSA
+					getfield_a_this 23;		// reference henrik/cardTest.k2
 					sconst_1;
-					invokevirtual 72;		// init(Ljavacard/security/Key;B)V
+					invokevirtual 71;		// init(Ljavacard/security/Key;B)V
 				L48:	aload_1;
-					invokevirtual 68;		// setIncomingAndReceive()S
+					invokevirtual 67;		// setIncomingAndReceive()S
 					sstore 6;
 					aload_0;
 					aload_1;
-					invokevirtual 69;		// getIncomingLength()S
-					putfield_s 30;		// short henrik/cardTest.size
+					invokevirtual 68;		// getIncomingLength()S
+					putfield_s 29;		// short henrik/cardTest.size
 					sconst_0;
 					sstore 7;
 					goto L50;
 				L49:	aload_2;
 					sload_3;
-					getfield_a_this 32;		// reference henrik/cardTest.cryptoBuffer
+					getfield_a_this 31;		// reference henrik/cardTest.cryptoBuffer
 					sload 7;
 					sload 6;
-					invokestatic 71;		// javacard/framework/Util.arrayCopyNonAtomic([BS[BSS)S
+					invokestatic 70;		// javacard/framework/Util.arrayCopyNonAtomic([BS[BSS)S
 					pop;
 					sload 7;
 					sload 6;
@@ -1009,28 +1000,28 @@
 					sstore 7;
 					aload_1;
 					sload_3;
-					invokevirtual 77;		// receiveBytes(S)S
+					invokevirtual 76;		// receiveBytes(S)S
 					sstore 6;
 				L50:	sload 6;
 					ifgt L49;
 				L51:	aload_0;
-					getfield_a_this 25;		// reference henrik/cardTest.cipherRSA
-					getfield_a_this 32;		// reference henrik/cardTest.cryptoBuffer
+					getfield_a_this 24;		// reference henrik/cardTest.cipherRSA
+					getfield_a_this 31;		// reference henrik/cardTest.cryptoBuffer
 					sconst_0;
-					getfield_s_this 30;		// short henrik/cardTest.size
+					getfield_s_this 29;		// short henrik/cardTest.size
 					getfield_a_this 1;		// reference henrik/cardTest.output
 					sconst_0;
-					invokevirtual 73;		// doFinal([BSS[BS)S
-					putfield_s 30;		// short henrik/cardTest.size
+					invokevirtual 72;		// doFinal([BSS[BS)S
+					putfield_s 29;		// short henrik/cardTest.size
 					goto_w L68;
 				L52:	goto_w L68;
 				L53:	aload_1;
-					invokevirtual 68;		// setIncomingAndReceive()S
+					invokevirtual 67;		// setIncomingAndReceive()S
 					sstore 8;
 					aload_0;
 					aload_1;
-					invokevirtual 69;		// getIncomingLength()S
-					putfield_s 30;		// short henrik/cardTest.size
+					invokevirtual 68;		// getIncomingLength()S
+					putfield_s 29;		// short henrik/cardTest.size
 					sconst_0;
 					sstore 9;
 					goto L55;
@@ -1039,7 +1030,7 @@
 					getfield_a_this 1;		// reference henrik/cardTest.output
 					sload 9;
 					sload 8;
-					invokestatic 71;		// javacard/framework/Util.arrayCopyNonAtomic([BS[BSS)S
+					invokestatic 70;		// javacard/framework/Util.arrayCopyNonAtomic([BS[BSS)S
 					pop;
 					sload 9;
 					sload 8;
@@ -1047,7 +1038,7 @@
 					sstore 9;
 					aload_1;
 					sload_3;
-					invokevirtual 77;		// receiveBytes(S)S
+					invokevirtual 76;		// receiveBytes(S)S
 					sstore 8;
 				L55:	sload 8;
 					ifgt L54;
@@ -1059,34 +1050,34 @@
 					sload 10;
 					sconst_1;
 					if_scmpne L59;
-				L58:	getfield_a_this 26;		// reference henrik/cardTest.cipherAES
-					getfield_a_this 27;		// reference henrik/cardTest.aesKey
+				L58:	getfield_a_this 25;		// reference henrik/cardTest.cipherAES
+					getfield_a_this 26;		// reference henrik/cardTest.aesKey
 					sconst_2;
-					invokevirtual 72;		// init(Ljavacard/security/Key;B)V
+					invokevirtual 71;		// init(Ljavacard/security/Key;B)V
 					goto L61;
 				L59:	sload 10;
 					sconst_2;
 					if_scmpne L61;
-				L60:	getfield_a_this 26;		// reference henrik/cardTest.cipherAES
-					getfield_a_this 27;		// reference henrik/cardTest.aesKey
+				L60:	getfield_a_this 25;		// reference henrik/cardTest.cipherAES
+					getfield_a_this 26;		// reference henrik/cardTest.aesKey
 					sconst_1;
-					invokevirtual 72;		// init(Ljavacard/security/Key;B)V
+					invokevirtual 71;		// init(Ljavacard/security/Key;B)V
 				L61:	aload_1;
-					invokevirtual 68;		// setIncomingAndReceive()S
+					invokevirtual 67;		// setIncomingAndReceive()S
 					sstore 11;
 					aload_0;
 					aload_1;
-					invokevirtual 69;		// getIncomingLength()S
-					putfield_s 30;		// short henrik/cardTest.size
+					invokevirtual 68;		// getIncomingLength()S
+					putfield_s 29;		// short henrik/cardTest.size
 					sconst_0;
 					sstore 12;
 					goto L63;
 				L62:	aload_2;
 					sload_3;
-					getfield_a_this 32;		// reference henrik/cardTest.cryptoBuffer
+					getfield_a_this 31;		// reference henrik/cardTest.cryptoBuffer
 					sload 12;
 					sload 11;
-					invokestatic 71;		// javacard/framework/Util.arrayCopyNonAtomic([BS[BSS)S
+					invokestatic 70;		// javacard/framework/Util.arrayCopyNonAtomic([BS[BSS)S
 					pop;
 					sload 12;
 					sload 11;
@@ -1094,28 +1085,28 @@
 					sstore 12;
 					aload_1;
 					sload_3;
-					invokevirtual 77;		// receiveBytes(S)S
+					invokevirtual 76;		// receiveBytes(S)S
 					sstore 11;
 				L63:	sload 11;
 					ifgt L62;
 				L64:	aload_0;
-					getfield_a_this 26;		// reference henrik/cardTest.cipherAES
-					getfield_a_this 32;		// reference henrik/cardTest.cryptoBuffer
+					getfield_a_this 25;		// reference henrik/cardTest.cipherAES
+					getfield_a_this 31;		// reference henrik/cardTest.cryptoBuffer
 					sconst_0;
-					getfield_s_this 30;		// short henrik/cardTest.size
+					getfield_s_this 29;		// short henrik/cardTest.size
 					getfield_a_this 1;		// reference henrik/cardTest.output
 					sconst_0;
-					invokevirtual 73;		// doFinal([BSS[BS)S
-					putfield_s 30;		// short henrik/cardTest.size
+					invokevirtual 72;		// doFinal([BSS[BS)S
+					putfield_s 29;		// short henrik/cardTest.size
 				L65:	goto L68;
 				L66:	astore 13;
 					aload_0;
 					sconst_2;
-					putfield_s 30;		// short henrik/cardTest.size
+					putfield_s 29;		// short henrik/cardTest.size
 					getfield_a_this 1;		// reference henrik/cardTest.output
 					sconst_0;
 					aload 13;
-					invokevirtual 52;		// getReason()S
+					invokevirtual 51;		// getReason()S
 					s2b;
 					bastore;
 					getfield_a_this 1;		// reference henrik/cardTest.output
@@ -1124,17 +1115,17 @@
 					bastore;
 					goto L68;
 				L67:	sspush 27904;
-					invokestatic 53;		// javacard/framework/ISOException.throwIt(S)V
+					invokestatic 52;		// javacard/framework/ISOException.throwIt(S)V
 				L68:	aload_0;
 					aload_1;
-					invokespecial 76;		// henrik/cardTest.send(Ljavacard/framework/APDU;)V
+					invokespecial 75;		// henrik/cardTest.send(Ljavacard/framework/APDU;)V
 					return;
 			.exceptionTable {
 				// start_block end_block handler_block catch_type_index
-				L32 L33 L34 48;
-				L32 L33 L35 46;
-				L38 L39 L40 48;
-				L64 L65 L66 48;
+				L32 L33 L34 59;
+				L32 L33 L35 47;
+				L38 L39 L40 59;
+				L64 L65 L66 59;
 			}
 		}
 
@@ -1168,16 +1159,16 @@
 			.descriptor	Ljavacard/framework/APDU;	0.10;
 
 				L0:	aload_1;
-					invokevirtual 78;		// setOutgoing()S
+					invokevirtual 77;		// setOutgoing()S
 					pop;
 					aload_1;
-					getfield_s_this 30;		// short henrik/cardTest.size
-					invokevirtual 79;		// setOutgoingLength(S)V
+					getfield_s_this 29;		// short henrik/cardTest.size
+					invokevirtual 78;		// setOutgoingLength(S)V
 					aload_1;
 					getfield_a_this 1;		// reference henrik/cardTest.output
 					sconst_0;
-					getfield_s_this 30;		// short henrik/cardTest.size
-					invokevirtual 80;		// sendBytesLong([BSS)V
+					getfield_s_this 29;		// short henrik/cardTest.size
+					invokevirtual 79;		// sendBytesLong([BSS)V
 					return;
 		}
 
@@ -1189,8 +1180,8 @@
 
 				L0:	aload_1;
 					sconst_0;
-					getfield_s_this 30;		// short henrik/cardTest.size
-					invokevirtual 81;		// setOutgoingAndSend(SS)V
+					getfield_s_this 29;		// short henrik/cardTest.size
+					invokevirtual 80;		// setOutgoingAndSend(SS)V
 					return;
 		}
 

@@ -114,7 +114,6 @@ public class cardTest extends Applet implements ExtendedLength{
 			
 			
 			keys = new KeyPair(KeyPair.ALG_RSA, KeyBuilder.LENGTH_RSA_512);
-			mKeys = new KeyPair(KeyPair.ALG_RSA, KeyBuilder.LENGTH_RSA_512);
 			sKeys = new KeyPair(KeyPair.ALG_RSA, KeyBuilder.LENGTH_RSA_2048);
 			//keys = new KeyPair(KeyPair.ALG_RSA, KeyBuilder.LENGTH_RSA_2048);
 			
@@ -124,10 +123,7 @@ public class cardTest extends Applet implements ExtendedLength{
 			sKeys.genKeyPair();
 			sPub = (RSAPublicKey) sKeys.getPublic();
 			
-			mKeys.genKeyPair();
-			mPub = (RSAPublicKey) mKeys.getPublic();
-			
-			//mPub = (RSAPublicKey) KeyBuilder.buildKey(KeyBuilder.TYPE_RSA_PUBLIC, (short) 512, false);
+			mPub = (RSAPublicKey) KeyBuilder.buildKey(KeyBuilder.TYPE_RSA_PUBLIC, (short) 512, false);
 			
 			//Generate the card keys
 			keys.genKeyPair();
