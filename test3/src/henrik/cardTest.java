@@ -125,7 +125,8 @@ public class cardTest extends Applet implements ExtendedLength{
 			sPub = (RSAPublicKey) sKeys.getPublic();
 			
 			mKeys.genKeyPair();
-			mPub = (RSAPublicKey) mKeys.getPublic();
+			//mPub = (RSAPublicKey) mKeys.getPublic();
+			mPub = null;
 			
 			//Generate the card keys
 			keys.genKeyPair();
@@ -319,23 +320,38 @@ public class cardTest extends Applet implements ExtendedLength{
 				
 				boolean mPubIsOK = false;
 				
+				/*
+				if(true){
+					Util.arrayCopyNonAtomic(h0Buffer, (short) 1, output, (short) 0, modLength);
+					//size = mPub.getModulus(output, (short) 0);
+					size = modLength;
+					break;
+					
+				}
+				*/
 				
 				try{
 					mPub.setModulus(h0Buffer, (short) 1, modLength);
-					//size = mPub.getModulus(output, (short) 0);
+					
 					mPub.setExponent(h0Buffer, expStartPos, expLength);
 					//size = mPub.getExponent(output, (short) 0);
 					mPubIsOK = true;
+					//size = mPub.getModulus(output, (short) 0);
+					//if(true){
+					//	break;
+					//}
 				}
 				catch(CryptoException ex){
 					output[0] = (byte) ex.getReason();
-					output[1] = (byte) 0x09;
+					output[1] = (byte) 0x02;
 					size = 2;
+					break;
 				}
 				catch(Exception ex){
 					output[0] = (byte) 0x08;
 					output[1] = (byte) 0x08;
 					size = 2;
+					break;
 				}
 				
 				if(mPubIsOK){

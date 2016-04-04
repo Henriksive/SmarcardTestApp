@@ -1,5 +1,5 @@
 // converted by version 1.3
-// on Fri Mar 18 10:59:44 CET 2016
+// on Wed Mar 30 16:19:40 CEST 2016
 
 .package henrik {
 	.aid 0x1:0x2:0x3:0x4:0x5:0x6:0x7:0x8:0x9:0x0;
@@ -772,12 +772,12 @@
 					bastore;
 					getfield_a_this 1;		// reference henrik/cardTest.output
 					sconst_1;
-					bspush 9;
+					sconst_2;
 					bastore;
 					aload_0;
 					sconst_2;
 					putfield_s 30;		// short henrik/cardTest.size
-					goto L36;
+					goto_w L68;
 				L35:	astore 13;
 					getfield_a_this 1;		// reference henrik/cardTest.output
 					sconst_0;
@@ -790,6 +790,7 @@
 					aload_0;
 					sconst_2;
 					putfield_s 30;		// short henrik/cardTest.size
+					goto_w L68;
 				L36:	sload 12;
 					ifeq_w L41;
 				L37:	getfield_a_this 22;		// reference henrik/cardTest.mPub
