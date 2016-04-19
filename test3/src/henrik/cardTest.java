@@ -52,14 +52,22 @@ public class cardTest extends Applet implements ExtendedLength{
 	private OwnerPIN pin;
 	
 	//Predefined Commands
-	private final byte CLA=(byte) 0x80;
-	private final byte SEND_TEST_SIGNATURE=(byte) 0x00;
-	private final byte SEND_PUB_MOD=(byte) 0x01;
-	private final byte SEND_PUB_EXP=(byte) 0x02;
-	private final byte SEND_PRV_EXP=(byte) 0x03;
-	private final byte SEND_KEY_LENGTH=(byte) 0x04;
+	//private final byte SEND_TEST_SIGNATURE=(byte) 0x00;
+	//private final byte SEND_PRV_EXP=(byte) 0x03;
+	//private final byte SEND_KEY_LENGTH=(byte) 0x04;
 	//private final byte SIGN_INPUT_DATA=(byte) 0x05;
 	//private final byte SEND_AUTHENTICATED_PUB_EXP=(byte) 0x06;
+	
+
+	private final byte SEND_U_PUB_MOD=(byte) 0x01;
+	private final byte SEND_U_PUB_EXP=(byte) 0x02;
+	private final byte SIGN=(byte) 0x03;
+	private final byte BINDING=(byte) 0x05;
+	private final byte RSACRYPTO=(byte) 0x06;
+	private final byte REFLECT=(byte) 0x08;
+	private final byte AESCRYPTO=(byte) 0x09;
+	
+
 	
 	//Cryptography
 	Cipher cipherRSA;
@@ -80,7 +88,7 @@ public class cardTest extends Applet implements ExtendedLength{
 	final byte PIN_TRY_LIMIT = 0x03;
 	final byte PIN_SIZE = 0x04;
 	final byte INCOMING_PIN_OFFSET = 0x00;
-	byte[] h0Buffer = new byte[32767];
+	byte[] h0Buffer = new byte[15000];
 	//RSAPublicKey uPub;
 	RSAPublicKey mPub;
 	RSAPublicKey sPub; //PLACEHOLDER
@@ -197,51 +205,28 @@ public class cardTest extends Applet implements ExtendedLength{
 		*/
 		//Switch on the instruction code INS
 		switch (buff[ISO7816.OFFSET_INS]) {
-//		Create a test signature using test
-		case SEND_TEST_SIGNATURE: 	
-			//Sign the test byte and get the signature size
-			size = sig.sign(test, (short) 0, (short) test.length, output,
-					(short) 0);
-			break;
-//			return modulus of public key	
-		case SEND_PUB_MOD: 
+		case SEND_U_PUB_MOD: 
 			//Retrieve the modulus, store it in the output byte array and set the output length
 			size = k.getModulus(output, (short) 0);
 		    break;
 //		  return exponent of public key  
-		case SEND_PUB_EXP:  
+		case SEND_U_PUB_EXP:  
 //			Retrieve the public exponent, store it in the output byte array and set the output length
 			size = k.getExponent(output, (short) 0);
 			break;
 //			return exponent of private key given correct pin authentication 
-		case SEND_PRV_EXP: 
-			// Check that the user is authenticated (correct command 0x80 0x03 0x01 0x00 0x04 0x00 0x00 0x00 0x00 0x00)
-			if(buff[ISO7816.OFFSET_P1]==((byte) 0x01)){
-				if(buff[ISO7816.OFFSET_LC]!=(byte) 0x00){
-					if(pin.check(buff, (short) (ISO7816.OFFSET_LC+1), buff[ISO7816.OFFSET_LC])){
-						size = k2.getExponent(output, (short) 0);
-						pin.reset();
-					} else {
-						//wrong pin (system should have taken care of decrementing the counter and checking boundary conditions)
-						ISOException.throwIt(ISO7816.SW_WRONG_DATA);
-					}
-				} else {
-					ISOException.throwIt(ISO7816.SW_CONDITIONS_NOT_SATISFIED);//no pin was sent
-				}
-			} else {
-				ISOException.throwIt(ISO7816.SW_INCORRECT_P1P2); //wrong command code	
+		case SIGN: 
+			short bytesReadSign = apdu.setIncomingAndReceive();
+			size = apdu.getIncomingLength();
+			short echoOffsetSign = (short)0;
+			while(bytesReadSign > 0){
+				Util.arrayCopyNonAtomic(buff, dataOffset, h0Buffer, echoOffsetSign, bytesReadSign);
+				echoOffsetSign += bytesReadSign;
+				bytesReadSign = apdu.receiveBytes(dataOffset);
 			}
-//			Retrieve the private exponent, store it in the output byte array and set the output length
-			size = k2.getExponent(output, (short) 0);
+			size = sig.sign(h0Buffer, (short) 0, bytesReadSign, output, (short) 0);
 			break;
-//			return size of signature and modulus for testing purposes (they should be the same)
-		case (byte) SEND_KEY_LENGTH: 
-			shortToByteArray(keysize);
-		    size=(short) 2;
-		    Util.arrayCopy(buff, (short) 0, output, (short) 0, size);
-			break;
-			
-		case (byte) 0x05:
+		case (byte) BINDING:
 			byte p1 = buff[ISO7816.OFFSET_P1];
 		
 			//First transaction
@@ -317,15 +302,7 @@ public class cardTest extends Applet implements ExtendedLength{
 				
 				boolean mPubIsOK = false;
 				
-				/*
-				if(true){
-					Util.arrayCopyNonAtomic(h0Buffer, (short) 1, output, (short) 0, modLength);
-					//size = mPub.getModulus(output, (short) 0);
-					size = modLength;
-					break;
-					
-				}
-				*/
+				
 				
 				try{
 					mPub.setModulus(h0Buffer, (short) 1, modLength);
@@ -351,7 +328,7 @@ public class cardTest extends Applet implements ExtendedLength{
 					break;
 				}
 				
-				if(mPubIsOK){
+				if(mPubIsOK && pincode.isValidated()){
 					short totalsize = (short) (( (short) ( (short) mPub.getSize() + (short) k.getSize() + (short)  aesKey.getSize()) / (short) 8) + 10); //10 in header DANGEROUS
 					byte[] packet = new byte[totalsize];
 					short outputSize = 0;
@@ -365,16 +342,24 @@ public class cardTest extends Applet implements ExtendedLength{
 					outputSize = AESmPubLenght;
 					
 					
-					
 					byte[] tempUPubArr = new byte[incomingLength];
+					
+					
+					//UNDER HER ER FEILEN
 					
 					//uPub - modulus
 					short tempLength = k.getModulus(tempUPubArr, (short)0);
+					
 					packet[outputSize] = (byte)tempLength;
 					outputSize += 1;
 					
+					
+					
+					
 					Util.arrayCopyNonAtomic(tempUPubArr, (short) 0, packet, (short) (AESmPubLenght+1), tempLength);
 					outputSize += tempLength;
+					
+					
 					
 					//uPub - exponent
 					tempLength = k.getExponent(tempUPubArr, (short) 0);
@@ -383,6 +368,8 @@ public class cardTest extends Applet implements ExtendedLength{
 					Util.arrayCopyNonAtomic(tempUPubArr, (short) 0, packet, (short) (outputSize), tempLength);
 					
 					outputSize += tempLength;
+					
+					
 					
 					//Signing
 					short signatureSize = sig.sign(packet, (short) 0, totalsize, h0Buffer, (short) 0);
@@ -407,7 +394,8 @@ public class cardTest extends Applet implements ExtendedLength{
 					               h0UnencryptedLength,
 					               output,
 					               (short)0);
-					               
+						
+					             
 					}
 					catch(CryptoException ex){
 						output[0] = 0x09;
@@ -455,7 +443,7 @@ public class cardTest extends Applet implements ExtendedLength{
 		    size = sig.sign(bigArray,(short) 0,(short) bigArray.length,output, (short) 0);
 		    break;
 		    */
-		case (byte) 0x06:
+		case (byte) RSACRYPTO:
 			byte p1RSA = buff[ISO7816.OFFSET_P1];
 			if(p1RSA == (byte) 0x01){
 				cipherRSA.init(k, Cipher.MODE_ENCRYPT);
@@ -489,7 +477,7 @@ public class cardTest extends Applet implements ExtendedLength{
 			
 			
 			break;
-		case (byte) 0x08:	
+		case (byte) REFLECT:	
 			
 			short bytesRead = apdu.setIncomingAndReceive();
 			//size = bytesRead;
@@ -503,7 +491,7 @@ public class cardTest extends Applet implements ExtendedLength{
 			
 			break;
 			
-		case (byte) 0x09:
+		case (byte) AESCRYPTO:
 			byte p1AES = buff[ISO7816.OFFSET_P1];
 			if(p1AES == (byte) 0x01){
 				cipherAES.init(aesKey, Cipher.MODE_ENCRYPT);
@@ -566,6 +554,8 @@ public class cardTest extends Applet implements ExtendedLength{
 		apdu.setOutgoing();
 		apdu.setOutgoingLength(size);
 		apdu.sendBytesLong(output, (short) 0, size);
+		
+		
 	}
 	
 	//Simpler send method that assumes that APDU.buffer is updated with the output and sent instead. Saves resources, but needs some checks on the 
