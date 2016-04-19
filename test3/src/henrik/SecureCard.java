@@ -19,7 +19,7 @@ import javacardx.crypto.*;
 import javacard.security.*;
 import javacard.framework.JCSystem;
 
-public class cardTest extends Applet implements ExtendedLength{
+public class SecureCard extends Applet implements ExtendedLength{
 	//Try to allocate all variable here and do not create new ones 
 	//The Public/Private key pair that this card will use
 	private KeyPair keys;
@@ -27,14 +27,9 @@ public class cardTest extends Applet implements ExtendedLength{
 	//Signature object to sign with card private key
 	private Signature sig;
 	//Card Public key
-	private RSAPublicKey k;
+	private RSAPublicKey uPub;
     //Card Private key
-	private RSAPrivateKey k2;
-    //TODO Local Certificate database for verification. Limit to xx certificates
-	//private Certificate[]=new byte[10];
-	
-	//byte[] testSig = new byte[256];
-	byte[] test = { 0x01, 0x02, 0x04, 0x05, 0x06, 0x07 };
+	private RSAPrivateKey uPrv;
     //	To store data to be sent beck to host application
 	byte[] output = new byte[32767];
 	//for temporary storing data before copying into output
@@ -79,26 +74,12 @@ public class cardTest extends Applet implements ExtendedLength{
 	final byte PIN_SIZE = 0x04;
 	final byte INCOMING_PIN_OFFSET = 0x00;
 	byte[] h0Buffer = new byte[15000];
-	//RSAPublicKey uPub;
 	RSAPublicKey mPub;
 	RSAPublicKey sPub; //PLACEHOLDER
 	
 	
-	
-	
-	//AESKey aesKey;
-	private cardTest() {
-		
-		//Instantiate all object the applet will ever need
-		//pin= new OwnerPIN(MAX_LENGTH, MAX_ATTEMPTS);
-		//if(bArray==null){//check 
-//			If no pin is passed as parameter at installation time use default 0000
-			//pin.update(new byte[] {0x00,0x00,0x00,0x00}, (short) 0, (byte) 0x04);
-		//	}
-		//else {
-			//pin.update(bArray, bOffset,  bLength);
-		//}
-		
+	private SecureCard() {
+		//Instantiate all object the applet will ever need		
 		try{
 			
 			//Binding
@@ -126,12 +107,12 @@ public class cardTest extends Applet implements ExtendedLength{
 			//Generate the card keys
 			keys.genKeyPair();
 			//Get the public key
-			k = (RSAPublicKey) keys.getPublic();
+			uPub = (RSAPublicKey) keys.getPublic();
 			
 			//Get the private key
-			k2 = (RSAPrivateKey) keys.getPrivate();
+			uPrv = (RSAPrivateKey) keys.getPrivate();
 			//Initialize the signature object with card private key
-			sig.init(k2, Signature.MODE_SIGN);
+			sig.init(uPrv, Signature.MODE_SIGN);
 			
 			//Crypto RSA
 			cipherRSA = Cipher.getInstance(Cipher.ALG_RSA_PKCS1, false);
@@ -165,7 +146,7 @@ public class cardTest extends Applet implements ExtendedLength{
 	public static void install(byte[] bArray, short bOffset, byte bLength) {
 		// GP-compliant JavaCard applet registration
 		
-		new cardTest().register();//bArray, (short) (bOffset + 1), bArray[bOffset]);<-This was the reason it was giving error at installation time when creating the keys in the contructor....
+		new SecureCard().register();//bArray, (short) (bOffset + 1), bArray[bOffset]);<-This was the reason it was giving error at installation time when creating the keys in the contructor....
 	}
 
 	public void process(APDU apdu) {
@@ -182,12 +163,12 @@ public class cardTest extends Applet implements ExtendedLength{
 		switch (buff[ISO7816.OFFSET_INS]) {
 		case SEND_U_PUB_MOD: 
 			//Retrieve the modulus, store it in the output byte array and set the output length
-			size = k.getModulus(output, (short) 0);
+			size = uPub.getModulus(output, (short) 0);
 		    break;
 //		  return exponent of public key  
 		case SEND_U_PUB_EXP:  
 //			Retrieve the public exponent, store it in the output byte array and set the output length
-			size = k.getExponent(output, (short) 0);
+			size = uPub.getExponent(output, (short) 0);
 			break;
 //			return exponent of private key given correct pin authentication 
 		case SIGN: 
@@ -284,7 +265,7 @@ public class cardTest extends Applet implements ExtendedLength{
 				}
 				
 				if(mPubIsOK && pincode.isValidated()){
-					short totalsize = (short) (( (short) ( (short) mPub.getSize() + (short) k.getSize() + (short)  aesKey.getSize()) / (short) 8) + 10); //10 in header DANGEROUS
+					short totalsize = (short) (( (short) ( (short) mPub.getSize() + (short) uPub.getSize() + (short)  aesKey.getSize()) / (short) 8) + 10); //10 in header DANGEROUS
 					byte[] packet = new byte[totalsize];
 					short outputSize = 0;
 					
@@ -299,14 +280,14 @@ public class cardTest extends Applet implements ExtendedLength{
 					byte[] tempUPubArr = new byte[incomingLength];
 					
 					//uPub - modulus
-					short tempLength = k.getModulus(tempUPubArr, (short)0);
+					short tempLength = uPub.getModulus(tempUPubArr, (short)0);
 					packet[outputSize] = (byte)tempLength;
 					outputSize += 1;
 					Util.arrayCopyNonAtomic(tempUPubArr, (short) 0, packet, (short) (AESmPubLenght+1), tempLength);
 					outputSize += tempLength;
 					
 					//uPub - exponent
-					tempLength = k.getExponent(tempUPubArr, (short) 0);
+					tempLength = uPub.getExponent(tempUPubArr, (short) 0);
 					packet[outputSize] = (byte)tempLength;
 					outputSize +=1;
 					Util.arrayCopyNonAtomic(tempUPubArr, (short) 0, packet, (short) (outputSize), tempLength);
@@ -360,10 +341,10 @@ public class cardTest extends Applet implements ExtendedLength{
 		case (byte) RSACRYPTO:
 			byte p1RSA = buff[ISO7816.OFFSET_P1];
 			if(p1RSA == (byte) 0x01){
-				cipherRSA.init(k, Cipher.MODE_ENCRYPT);
+				cipherRSA.init(uPub, Cipher.MODE_ENCRYPT);
 			}
 			else if(p1RSA == (byte) 0x02){
-				cipherRSA.init(k2, Cipher.MODE_DECRYPT);
+				cipherRSA.init(uPrv, Cipher.MODE_DECRYPT);
 			}
 		
 			short bytesReadRSA = apdu.setIncomingAndReceive();
