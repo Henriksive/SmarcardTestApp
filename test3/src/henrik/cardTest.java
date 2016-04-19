@@ -23,7 +23,6 @@ public class cardTest extends Applet implements ExtendedLength{
 	//Try to allocate all variable here and do not create new ones 
 	//The Public/Private key pair that this card will use
 	private KeyPair keys;
-	private KeyPair mKeys;
 	private KeyPair sKeys; //PLACEHOLDER
 	//Signature object to sign with card private key
 	private Signature sig;
@@ -48,17 +47,8 @@ public class cardTest extends Applet implements ExtendedLength{
 	short len;
 	//Size of modulus and signature
 	final short keysize=64;
-	//PIN
-	private OwnerPIN pin;
 	
 	//Predefined Commands
-	//private final byte SEND_TEST_SIGNATURE=(byte) 0x00;
-	//private final byte SEND_PRV_EXP=(byte) 0x03;
-	//private final byte SEND_KEY_LENGTH=(byte) 0x04;
-	//private final byte SIGN_INPUT_DATA=(byte) 0x05;
-	//private final byte SEND_AUTHENTICATED_PUB_EXP=(byte) 0x06;
-	
-
 	private final byte SEND_U_PUB_MOD=(byte) 0x01;
 	private final byte SEND_U_PUB_EXP=(byte) 0x02;
 	private final byte SIGN=(byte) 0x03;
@@ -184,25 +174,10 @@ public class cardTest extends Applet implements ExtendedLength{
 			return;
 		}
 		
-		
-		byte[] buff = apdu.getBuffer();
-		//output = new byte[32767];
-		
-		
-		short dataOffset = (short) 7;
-
-		 
+		byte[] buff = apdu.getBuffer();	
+		short dataOffset = (short) 7; //Hardcoded as it cannot be done dynamically (not working properly)
 		
 		
-		//Get the incoming APDU
-		//Util.arrayCopy(apdu.getBuffer(),(short) 0, buff,(short) 0,(short) apdu.getBuffer().length);// apdu.getBuffer();
-		//Check the CLA 
-		
-		/*
-		if(buff[ISO7816.OFFSET_CLA]!=CLA){
-			ISOException.throwIt(ISO7816.SW_CLA_NOT_SUPPORTED);
-		}
-		*/
 		//Switch on the instruction code INS
 		switch (buff[ISO7816.OFFSET_INS]) {
 		case SEND_U_PUB_MOD: 
@@ -288,32 +263,12 @@ public class cardTest extends Applet implements ExtendedLength{
 				short expLength = Util.makeShort((byte)0x00, h0Buffer[expLenghtPos]); 
 				short expStartPos = (short) (modLength + 2);
 				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
 				boolean mPubIsOK = false;
-				
-				
 				
 				try{
 					mPub.setModulus(h0Buffer, (short) 1, modLength);
-					
 					mPub.setExponent(h0Buffer, expStartPos, expLength);
-					//size = mPub.getExponent(output, (short) 0);
 					mPubIsOK = true;
-					//size = mPub.getModulus(output, (short) 0);
-					//if(true){
-					//	break;
-					//}
 				}
 				catch(CryptoException ex){
 					output[0] = (byte) ex.getReason();
@@ -340,37 +295,23 @@ public class cardTest extends Applet implements ExtendedLength{
 					Util.arrayCopyNonAtomic(h0Buffer, (short) 0, packet, AESKeyLength, (short) incomingLength);
 					short AESmPubLenght = (short) (incomingLength + AESKeyLength);
 					outputSize = AESmPubLenght;
-					
-					
+								
 					byte[] tempUPubArr = new byte[incomingLength];
-					
-					
-					//UNDER HER ER FEILEN
 					
 					//uPub - modulus
 					short tempLength = k.getModulus(tempUPubArr, (short)0);
-					
 					packet[outputSize] = (byte)tempLength;
 					outputSize += 1;
-					
-					
-					
-					
 					Util.arrayCopyNonAtomic(tempUPubArr, (short) 0, packet, (short) (AESmPubLenght+1), tempLength);
 					outputSize += tempLength;
-					
-					
 					
 					//uPub - exponent
 					tempLength = k.getExponent(tempUPubArr, (short) 0);
 					packet[outputSize] = (byte)tempLength;
 					outputSize +=1;
 					Util.arrayCopyNonAtomic(tempUPubArr, (short) 0, packet, (short) (outputSize), tempLength);
-					
 					outputSize += tempLength;
-					
-					
-					
+
 					//Signing
 					short signatureSize = sig.sign(packet, (short) 0, totalsize, h0Buffer, (short) 0);
 					short h0UnencryptedLength = (short) (signatureSize + outputSize);
@@ -379,9 +320,6 @@ public class cardTest extends Applet implements ExtendedLength{
 					byte[] h0Unencrypted = new byte[h0UnencryptedLength];
 					Util.arrayCopyNonAtomic(h0Buffer, (short) 0, h0Unencrypted, (short) 0, signatureSize);
 					Util.arrayCopyNonAtomic(packet, (short) 0, h0Unencrypted, signatureSize, totalsize);
-					
-					//Util.arrayCopyNonAtomic(h0Unencrypted, (short) 0, output, (short) 0, h0UnencryptedLength);
-					//size = h0UnencryptedLength;
 					
 					//Encrypt with sPub
 					cipherRSA.init(sPub, Cipher.MODE_ENCRYPT);
@@ -402,8 +340,6 @@ public class cardTest extends Applet implements ExtendedLength{
 						output[1] = (byte) ex.getReason();
 						size = 2;
 					}
-					//size = h0UnencryptedLength;
-					//size = sPub.getModulus(output, (short) 0);
 				}
 				else{
 					output[0] = 0x09;
@@ -421,28 +357,6 @@ public class cardTest extends Applet implements ExtendedLength{
 			
 			
 			break;
-//			Sign arbitrary text sent to card
-		/*case (byte) SIGN_INPUT_DATA: 
-			size=(short) buff[ISO7816.OFFSET_LC];
-		    size=sig.sign(buff,(short) (ISO7816.OFFSET_LC+1), size, output,
-					(short) 0);
-		    break;
-//			return the modulus of public keywith a random value sent from the host
-		*/
-		    /*
-		case (byte) SEND_AUTHENTICATED_PUB_EXP: 
-			//Find the size of the random value
-			size=(short) buff[ISO7816.OFFSET_LC];
-		    //If the current key is 2048 bit =256 bytes we need a big array to store all data to sign
-		    //TODO limit the size of the input value and do some checks on it 
-		    bigArray=JCSystem.makeTransientByteArray((short) (size+keysize), JCSystem.CLEAR_ON_RESET);
-		    //Update the signature object with that value
-		    Util.arrayCopy(buff, (short) (ISO7816.OFFSET_LC+1), bigArray, (short) 0, size);
-		    k.getModulus(bigArray, (short) (size));
-		    //Util.arrayCopy(buff, (short) 0, bigArray, (short) (ISO7816.OFFSET_LC+size+1), len);
-		    size = sig.sign(bigArray,(short) 0,(short) bigArray.length,output, (short) 0);
-		    break;
-		    */
 		case (byte) RSACRYPTO:
 			byte p1RSA = buff[ISO7816.OFFSET_P1];
 			if(p1RSA == (byte) 0x01){
@@ -451,11 +365,8 @@ public class cardTest extends Applet implements ExtendedLength{
 			else if(p1RSA == (byte) 0x02){
 				cipherRSA.init(k2, Cipher.MODE_DECRYPT);
 			}
-			
-			
 		
 			short bytesReadRSA = apdu.setIncomingAndReceive();
-			//size = bytesRead;
 			size = apdu.getIncomingLength();
 			short echoOffsetRSA = (short)0;
 			while(bytesReadRSA > 0){
@@ -472,11 +383,7 @@ public class cardTest extends Applet implements ExtendedLength{
 		               output,
 		               (short)0);
 			break;
-		    
-		case (byte) 0x07:
-			
-			
-			break;
+
 		case (byte) REFLECT:	
 			
 			short bytesRead = apdu.setIncomingAndReceive();
@@ -488,7 +395,6 @@ public class cardTest extends Applet implements ExtendedLength{
 				echoOffset += bytesRead;
 	            bytesRead = apdu.receiveBytes(dataOffset);
 			}
-			
 			break;
 			
 		case (byte) AESCRYPTO:
@@ -502,7 +408,6 @@ public class cardTest extends Applet implements ExtendedLength{
 			
 			
 			short bytesReadECAES = apdu.setIncomingAndReceive();
-			//size = bytesRead;
 			size = apdu.getIncomingLength();
 			short echoOffsetECAES = (short)0;
 			while(bytesReadECAES > 0){
@@ -534,12 +439,6 @@ public class cardTest extends Applet implements ExtendedLength{
 		
 		send(apdu);
 	}
-
-	
-	//Converts two adjacent bytes in a given array to a short 
-	/*private static short readShort(byte[] data, short offset) {
-		return (short) (((data[offset] << 8)) | ((data[offset + 1] & 0xff)));
-	}*/
 	
 	//Convert a short value to a byte array and writes the result in the first two elements of buff
 	private void shortToByteArray(short s) {
@@ -554,8 +453,6 @@ public class cardTest extends Applet implements ExtendedLength{
 		apdu.setOutgoing();
 		apdu.setOutgoingLength(size);
 		apdu.sendBytesLong(output, (short) 0, size);
-		
-		
 	}
 	
 	//Simpler send method that assumes that APDU.buffer is updated with the output and sent instead. Saves resources, but needs some checks on the 
