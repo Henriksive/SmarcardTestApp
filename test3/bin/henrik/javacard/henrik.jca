@@ -1,5 +1,5 @@
 // converted by version 1.3
-// on Tue Apr 19 13:36:03 CEST 2016
+// on Tue Apr 19 13:45:12 CEST 2016
 
 .package henrik {
 	.aid 0x1:0x2:0x3:0x4:0x5:0x6:0x7:0x8:0x9:0x0;
@@ -188,8 +188,6 @@
 		virtualMethodRef 0.10.9(S)V;		// setOutgoingLength(S)V
 		// 75
 		virtualMethodRef 0.10.5([BSS)V;		// sendBytesLong([BSS)V
-		// 76
-		virtualMethodRef 0.10.8(SS)V;		// setOutgoingAndSend(SS)V
 	}
 
 	.class public SecureCard 0 extends 0.3 {		// extends javacard/framework/Applet
@@ -1067,29 +1065,6 @@
 			}
 		}
 
-		.method private shortToByteArray(S)V {
-			.stack 4;
-			.locals 0;
-
-				L0:	getfield_a_this 1;		// reference henrik/SecureCard.buff2
-					sconst_0;
-					sload_1;
-					sspush -256;
-					sand;
-					bspush 8;
-					sshr;
-					s2b;
-					bastore;
-					getfield_a_this 1;		// reference henrik/SecureCard.buff2
-					sconst_1;
-					sload_1;
-					sspush 255;
-					sand;
-					s2b;
-					bastore;
-					return;
-		}
-
 		.method private send(Ljavacard/framework/APDU;)V {
 			.stack 4;
 			.locals 0;
@@ -1107,19 +1082,6 @@
 					sconst_0;
 					getfield_s_this 29;		// short henrik/SecureCard.size
 					invokevirtual 75;		// sendBytesLong([BSS)V
-					return;
-		}
-
-		.method private sendBuff(Ljavacard/framework/APDU;)V {
-			.stack 3;
-			.locals 0;
-
-			.descriptor	Ljavacard/framework/APDU;	0.10;
-
-				L0:	aload_1;
-					sconst_0;
-					getfield_s_this 29;		// short henrik/SecureCard.size
-					invokevirtual 76;		// setOutgoingAndSend(SS)V
 					return;
 		}
 

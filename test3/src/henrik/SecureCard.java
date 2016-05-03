@@ -1,6 +1,5 @@
 package henrik;
 
-
 import javacard.framework.APDU;
 import javacard.framework.Applet;
 import javacard.framework.ISO7816;
@@ -146,7 +145,7 @@ public class SecureCard extends Applet implements ExtendedLength{
 	public static void install(byte[] bArray, short bOffset, byte bLength) {
 		// GP-compliant JavaCard applet registration
 		
-		new SecureCard().register();//bArray, (short) (bOffset + 1), bArray[bOffset]);<-This was the reason it was giving error at installation time when creating the keys in the contructor....
+		new SecureCard().register();
 	}
 
 	public void process(APDU apdu) {
@@ -165,12 +164,10 @@ public class SecureCard extends Applet implements ExtendedLength{
 			//Retrieve the modulus, store it in the output byte array and set the output length
 			size = uPub.getModulus(output, (short) 0);
 		    break;
-//		  return exponent of public key  
 		case SEND_U_PUB_EXP:  
-//			Retrieve the public exponent, store it in the output byte array and set the output length
+			//Retrieve the public exponent, store it in the output byte array and set the output length
 			size = uPub.getExponent(output, (short) 0);
 			break;
-//			return exponent of private key given correct pin authentication 
 		case SIGN: 
 			short bytesReadSign = apdu.setIncomingAndReceive();
 			size = apdu.getIncomingLength();
@@ -420,26 +417,11 @@ public class SecureCard extends Applet implements ExtendedLength{
 		
 		send(apdu);
 	}
-	
-	//Convert a short value to a byte array and writes the result in the first two elements of buff
-	private void shortToByteArray(short s) {
-
-		buff2[0]=(byte) ((s & (short) 0xFF00) >> 8);
-		buff2[1]=(byte) (s & (short) 0x00FF);
-		return;
-	}
 
 	//Common method that sets the size of the output to the global variable size and sends the content of the global variable output 
 	private void send(APDU apdu) {
 		apdu.setOutgoing();
 		apdu.setOutgoingLength(size);
 		apdu.sendBytesLong(output, (short) 0, size);
-	}
-	
-	//Simpler send method that assumes that APDU.buffer is updated with the output and sent instead. Saves resources, but needs some checks on the 
-	//size of the incoming buffer
-	private void sendBuff(APDU apdu) {
-		apdu.setOutgoingAndSend((short) 0,size);
-	}
-    
+	}    
 }
