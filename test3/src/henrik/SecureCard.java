@@ -262,35 +262,25 @@ public class SecureCard extends Applet implements ExtendedLength{
 				}
 				
 				if(mPubIsOK && pincode.isValidated()){
-					short totalsize = (short) (( (short) ( (short) mPub.getSize() + (short) uPub.getSize() + (short)  aesKey.getSize()) / (short) 8) + 10); //10 in header DANGEROUS
+					
+					
+					short totalsize = (short) (( (short) ((short) mPub.getSize() + (short)  aesKey.getSize()) / (short) 8) + 5); //10 in header DANGEROUS
 					byte[] packet = new byte[totalsize];
 					short outputSize = 0;
+					
+					
 					
 					//AESKEY
 					aesKey.getKey(packet, (short) 0);
 					short AESKeyLength = (short) (aesKey.getSize()/8);
+					
 					//mPub
 					Util.arrayCopyNonAtomic(h0Buffer, (short) 0, packet, AESKeyLength, (short) incomingLength);
+					
 					short AESmPubLenght = (short) (incomingLength + AESKeyLength);
 					outputSize = AESmPubLenght;
-								
-					byte[] tempUPubArr = new byte[incomingLength];
-					
-					//uPub - modulus
-					short tempLength = uPub.getModulus(tempUPubArr, (short)0);
-					packet[outputSize] = (byte)tempLength;
-					outputSize += 1;
-					Util.arrayCopyNonAtomic(tempUPubArr, (short) 0, packet, (short) (AESmPubLenght+1), tempLength);
-					outputSize += tempLength;
-					
-					//uPub - exponent
-					tempLength = uPub.getExponent(tempUPubArr, (short) 0);
-					packet[outputSize] = (byte)tempLength;
-					outputSize +=1;
-					Util.arrayCopyNonAtomic(tempUPubArr, (short) 0, packet, (short) (outputSize), tempLength);
-					outputSize += tempLength;
 
-					//Signing
+					//SIGNING
 					short signatureSize = sig.sign(packet, (short) 0, totalsize, h0Buffer, (short) 0);
 					short h0UnencryptedLength = (short) (signatureSize + outputSize);
 					

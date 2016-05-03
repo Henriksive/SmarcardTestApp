@@ -1,5 +1,5 @@
 // converted by version 1.3
-// on Tue Apr 19 13:45:12 CEST 2016
+// on Tue May 03 13:41:39 CEST 2016
 
 .package henrik {
 	.aid 0x1:0x2:0x3:0x4:0x5:0x6:0x7:0x8:0x9:0x0;
@@ -456,7 +456,7 @@
 
 		.method public process(Ljavacard/framework/APDU;)V 7 {
 			.stack 7;
-			.locals 24;
+			.locals 22;
 
 			.descriptor	Ljavacard/framework/APDU;	0.10;
 
@@ -723,15 +723,12 @@
 					ifeq_w L36;
 				L32:	getfield_a_this 21;		// reference henrik/SecureCard.mPub
 					invokeinterface 1 32 1;		// javacard/security/RSAPublicKey
-					getfield_a_this 22;		// reference henrik/SecureCard.uPub
-					invokeinterface 1 32 1;		// javacard/security/RSAPublicKey
-					sadd;
 					getfield_a_this 26;		// reference henrik/SecureCard.aesKey
 					invokeinterface 1 44 1;		// javacard/security/AESKey
 					sadd;
 					bspush 8;
 					sdiv;
-					bspush 10;
+					sconst_5;
 					sadd;
 					sstore 15;
 					sload 15;
@@ -762,55 +759,6 @@
 					sstore 19;
 					sload 19;
 					sstore 17;
-					sload 8;
-					newarray 11;
-					astore 20;
-					getfield_a_this 22;		// reference henrik/SecureCard.uPub
-					aload 20;
-					sconst_0;
-					invokeinterface 3 32 5;		// javacard/security/RSAPublicKey
-					sstore 21;
-					aload 16;
-					sload 17;
-					sload 21;
-					s2b;
-					bastore;
-					sinc 17 1;
-					aload 20;
-					sconst_0;
-					aload 16;
-					sload 19;
-					sconst_1;
-					sadd;
-					sload 21;
-					invokestatic 66;		// javacard/framework/Util.arrayCopyNonAtomic([BS[BSS)S
-					pop;
-					sload 17;
-					sload 21;
-					sadd;
-					sstore 17;
-					getfield_a_this 22;		// reference henrik/SecureCard.uPub
-					aload 20;
-					sconst_0;
-					invokeinterface 3 32 4;		// javacard/security/RSAPublicKey
-					sstore 21;
-					aload 16;
-					sload 17;
-					sload 21;
-					s2b;
-					bastore;
-					sinc 17 1;
-					aload 20;
-					sconst_0;
-					aload 16;
-					sload 17;
-					sload 21;
-					invokestatic 66;		// javacard/framework/Util.arrayCopyNonAtomic([BS[BSS)S
-					pop;
-					sload 17;
-					sload 21;
-					sadd;
-					sstore 17;
 					getfield_a_this 19;		// reference henrik/SecureCard.sig
 					aload 16;
 					sconst_0;
@@ -818,25 +766,25 @@
 					getfield_a_this 14;		// reference henrik/SecureCard.h0Buffer
 					sconst_0;
 					invokevirtual 61;		// sign([BSS[BS)S
-					sstore 22;
-					sload 22;
+					sstore 20;
+					sload 20;
 					sload 17;
 					sadd;
-					sstore 23;
-					sload 23;
+					sstore 21;
+					sload 21;
 					newarray 11;
-					astore 24;
+					astore 22;
 					getfield_a_this 14;		// reference henrik/SecureCard.h0Buffer
 					sconst_0;
-					aload 24;
+					aload 22;
 					sconst_0;
-					sload 22;
+					sload 20;
 					invokestatic 66;		// javacard/framework/Util.arrayCopyNonAtomic([BS[BSS)S
 					pop;
 					aload 16;
 					sconst_0;
-					aload 24;
-					sload 22;
+					aload 22;
+					sload 20;
 					sload 15;
 					invokestatic 66;		// javacard/framework/Util.arrayCopyNonAtomic([BS[BSS)S
 					pop;
@@ -846,22 +794,22 @@
 					invokevirtual 67;		// init(Ljavacard/security/Key;B)V
 				L33:	aload_0;
 					getfield_a_this 24;		// reference henrik/SecureCard.cipherRSA
-					aload 24;
+					aload 22;
 					sconst_0;
-					sload 23;
+					sload 21;
 					getfield_a_this 0;		// reference henrik/SecureCard.output
 					sconst_0;
 					invokevirtual 68;		// doFinal([BSS[BS)S
 					putfield_s 29;		// short henrik/SecureCard.size
 				L34:	goto_w L62;
-				L35:	astore 25;
+				L35:	astore 23;
 					getfield_a_this 0;		// reference henrik/SecureCard.output
 					sconst_0;
 					bspush 9;
 					bastore;
 					getfield_a_this 0;		// reference henrik/SecureCard.output
 					sconst_1;
-					aload 25;
+					aload 23;
 					invokevirtual 51;		// getReason()S
 					s2b;
 					bastore;
